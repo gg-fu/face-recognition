@@ -1,0 +1,14 @@
+QMAKE_DEFAULT_INCDIRS = \
+    /opt/arm-2014.05/arm-none-linux-gnueabi/include/c++/4.8.3 \
+    /opt/arm-2014.05/arm-none-linux-gnueabi/include/c++/4.8.3/arm-none-linux-gnueabi \
+    /opt/arm-2014.05/arm-none-linux-gnueabi/include/c++/4.8.3/backward \
+    /opt/arm-2014.05/lib/gcc/arm-none-linux-gnueabi/4.8.3/include \
+    /opt/arm-2014.05/lib/gcc/arm-none-linux-gnueabi/4.8.3/include-fixed \
+    /opt/arm-2014.05/arm-none-linux-gnueabi/include \
+    /opt/arm-2014.05/arm-none-linux-gnueabi/libc/usr/include
+QMAKE_DEFAULT_LIBDIRS = \
+    /opt/arm-2014.05/lib/gcc/arm-none-linux-gnueabi/4.8.3 \
+    /opt/arm-2014.05/lib/gcc \
+    /opt/arm-2014.05/arm-none-linux-gnueabi/lib \
+    /opt/arm-2014.05/arm-none-linux-gnueabi/libc/lib \
+    /opt/arm-2014.05/arm-none-linux-gnueabi/libc/usr/lib
