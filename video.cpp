@@ -64,7 +64,7 @@ void CCamera::CCamera_init(camera_t* camera)
 
     struct v4l2_requestbuffers req;
     memset(&req, 0, sizeof req);
-    req.count = 4;
+    req.count = 1;
     req.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
     req.memory = V4L2_MEMORY_MMAP;
     if (xioctl(camera->fd, VIDIOC_REQBUFS, &req) == -1) quit("VIDIOC_REQBUFS");
@@ -79,7 +79,7 @@ void CCamera::CCamera_init(camera_t* camera)
         buf.memory = V4L2_MEMORY_MMAP;
         buf.index = i;
         if (xioctl(camera->fd, VIDIOC_QUERYBUF, &buf) == -1)
-        quit("VIDIOC_QUERYBUF");
+            quit("VIDIOC_QUERYBUF");
         if (buf.length > buf_max) buf_max = buf.length;
         camera->buffers[i].length = buf.length;
         camera->buffers[i].start = (uint8_t *)mmap(NULL, buf.length, PROT_READ | PROT_WRITE, MAP_SHARED,camera->fd, buf.m.offset);
@@ -180,9 +180,9 @@ int CCamera::convert_yuv_to_rgb_pixel(int y, int u, int v)
     if(r < 0) r = 0;
     if(g < 0) g = 0;
     if(b < 0) b = 0;
-    pixel[0] = r;
-    pixel[1] = g;
-    pixel[2] = b;
+    pixel[0] = 220*r/256;
+    pixel[1] = 220*g/256;
+    pixel[2] = 220*b/256;
     return pixel32;
 }
 int CCamera::convert_yuv_to_rgb_buffer(unsigned char *yuv, unsigned char *rgb, unsigned int width, unsigned int height)
@@ -267,4 +267,22 @@ camera_t* CCamera::CCamera_OPEN(const char * device,uint32_t width, uint32_t hei
     CCamera_start(camera);
     return camera;
 }
+
+void CCamera::CRgb2Mat(unsigned char *src,Mat &dst,unsigned int width,unsigned int height,unsigned int channels )
+{
+    dst=Mat(height,width,CV_8UC3);
+    memcpy(dst.data,src,width*height*channels);
+}
+
+
+
+
+
+
+
+
+
+
+
+
 

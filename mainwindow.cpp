@@ -13,8 +13,8 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     timer = new QTimer(this);
-    width = 640;
-    height = 480;
+    width = 160;
+    height = 120;
 
     rgb24Size = width * height * 3;
     rgb24Pitch = width * 3;
@@ -38,23 +38,34 @@ void MainWindow::pushButton_2_clicked()
     printf("width:%d,height:%d\n",camera->width,camera->height);
     C_camera->CCamera_init(camera);
     C_camera->CCamera_start(camera);
-    timer->start(50);
+    load_face_file(face_cascade_name);
+    timer->start(30);
 
 }
 
 void MainWindow::getFrame()
 {
+    Mat dst;
     C_camera->CCamera_capture(camera);
     C_camera->convert_yuv_to_rgb_buffer((unsigned char*)camera->head.start,(unsigned char*)rgb24, width, height);
-    QImage *mImage = new QImage((unsigned char *)rgb24, width, height, rgb24Pitch, QImage::Format_RGB888);
+    C_camera->CRgb2Mat(rgb24,dst,width,height,3);
+    detect_face(dst);
+    const unsigned char *IMG = (const unsigned char *)dst.data;
+    QImage *mImage = new QImage(IMG, width, height, rgb24Pitch, QImage::Format_RGB888);
+    *mImage = mImage->scaled(ui->label->size(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
     ui->label->setPixmap(QPixmap::fromImage(*mImage));
 }
 
 void MainWindow::pushButton_3_clicked()
 {
+    Mat dst;
     C_camera->CCamera_capture(camera);
     C_camera->convert_yuv_to_rgb_buffer((unsigned char*)camera->head.start,(unsigned char*)rgb24, width, height);
-    QImage *image = new QImage((unsigned char *)rgb24, width, height, rgb24Pitch, QImage::Format_RGB888);
+    C_camera->CRgb2Mat(rgb24,dst,width,height,3);
+    //detect_face(dst);
+    const unsigned char *IMG = (const unsigned char *)dst.data;
+    QImage *image = new QImage(IMG, width, height, rgb24Pitch, QImage::Format_RGB888);
+    image->save("/usr/local/result.jpg");
     *image = image->scaled(ui->label_2->size(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
     ui->label_2->setPixmap(QPixmap::fromImage(*image));
 }
@@ -86,6 +97,43 @@ void MainWindow::on_pushButton_4_clicked()
     }
 
 }
+
+int MainWindow::load_face_file(string file_path)
+{
+    if( !face_cascade.load( file_path ) )
+    {
+        printf("--(!)Error loading face cascade\n");
+        return -1;
+    }
+    return 0;
+}
+
+void MainWindow::detect_face(Mat &frame)
+{
+    vector<Rect> faces;
+    Mat frame_gray;
+
+
+    cvtColor( frame, frame_gray, COLOR_BGR2GRAY );
+
+    equalizeHist( frame_gray, frame_gray );
+    //-- Detect faces
+    face_cascade.detectMultiScale( frame_gray, faces, 1.2, 2, 0, Size(30, 30) );
+    for ( size_t i = 0; i < faces.size(); i++ )
+    {
+        Point retP1,retP2;
+        retP1.x = faces[i].x;
+        retP1.y = faces[i].y;
+        retP2.x = faces[i].x+faces[i].width;
+        retP2.y = faces[i].y+faces[i].height;
+        rectangle(frame, retP1, retP2, Scalar(0,255,0), 1, 4, 0);
+        printf("here\n");
+    }
+}
+
+
+
+
 
 
 

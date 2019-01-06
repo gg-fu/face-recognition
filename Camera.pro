@@ -51,8 +51,12 @@ LIBS += /usr/local/lib/libopencv_imgcodecs.so
 LIBS += /usr/local/lib/libopencv_imgproc.so
 LIBS += /usr/local/lib/libopencv_ml.so
 LIBS += /usr/local/lib/libopencv_objdetect.so
+LIBS += /usr/local/lib/libopencv_photo.so
 LIBS += /usr/local/lib/libopencv_video.so
+LIBS += /usr/local/lib/libopencv_shape.so
 LIBS += /usr/local/lib/libopencv_videoio.so
+LIBS += /usr/local/lib/libopencv_stitching.so
+LIBS += /usr/local/lib/libopencv_superres.so
 LIBS += /usr/local/jpeglib/lib/libjpeg.so
 
 

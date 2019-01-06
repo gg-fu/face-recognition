@@ -36,7 +36,7 @@ DISTNAME      = Camera1.0.0
 DISTDIR = /home/bruvin_lu/Camera/.tmp/Camera1.0.0
 LINK          = arm-none-linux-gnueabi-g++ -Its
 LFLAGS        = -Wl,-O1 -Wl,-rpath,/opt/qt5.7.0_arm/lib
-LIBS          = $(SUBLIBS) -L/opt/tslib1.4/lib /usr/local/lib/libopencv_core.so /usr/local/lib/libopencv_highgui.so /usr/local/lib/libopencv_calib3d.so /usr/local/lib/libopencv_features2d.so /usr/local/lib/libopencv_flann.so /usr/local/lib/libopencv_imgcodecs.so /usr/local/lib/libopencv_imgproc.so /usr/local/lib/libopencv_ml.so /usr/local/lib/libopencv_objdetect.so /usr/local/lib/libopencv_video.so /usr/local/lib/libopencv_videoio.so /usr/local/jpeglib/lib/libjpeg.so -L/opt/qt5.7.0_arm/lib -lQt5Widgets -L/opt/tslib/lib -lQt5Gui -lQt5Core -lpthread 
+LIBS          = $(SUBLIBS) -L/opt/tslib1.4/lib /usr/local/lib/libopencv_core.so /usr/local/lib/libopencv_highgui.so /usr/local/lib/libopencv_calib3d.so /usr/local/lib/libopencv_features2d.so /usr/local/lib/libopencv_flann.so /usr/local/lib/libopencv_imgcodecs.so /usr/local/lib/libopencv_imgproc.so /usr/local/lib/libopencv_ml.so /usr/local/lib/libopencv_objdetect.so /usr/local/lib/libopencv_photo.so /usr/local/lib/libopencv_video.so /usr/local/lib/libopencv_shape.so /usr/local/lib/libopencv_videoio.so /usr/local/lib/libopencv_stitching.so /usr/local/lib/libopencv_superres.so /usr/local/jpeglib/lib/libjpeg.so -L/opt/qt5.7.0_arm/lib -lQt5Widgets -L/opt/tslib/lib -lQt5Gui -lQt5Core -lpthread 
 AR            = arm-none-linux-gnueabi-ar cqs
 RANLIB        = 
 SED           = sed
@@ -646,11 +646,6 @@ moc_mainwindow.cpp: /opt/qt5.7.0_arm/include/QtWidgets/QMainWindow \
 		/opt/qt5.7.0_arm/include/QtGui/qinputmethod.h \
 		/opt/qt5.7.0_arm/include/QtWidgets/QButtonGroup \
 		/opt/qt5.7.0_arm/include/QtWidgets/qbuttongroup.h \
-		/opt/qt5.7.0_arm/include/QtWidgets/QHBoxLayout \
-		/opt/qt5.7.0_arm/include/QtWidgets/qboxlayout.h \
-		/opt/qt5.7.0_arm/include/QtWidgets/qlayout.h \
-		/opt/qt5.7.0_arm/include/QtWidgets/qlayoutitem.h \
-		/opt/qt5.7.0_arm/include/QtWidgets/qgridlayout.h \
 		/opt/qt5.7.0_arm/include/QtWidgets/QHeaderView \
 		/opt/qt5.7.0_arm/include/QtWidgets/qheaderview.h \
 		/opt/qt5.7.0_arm/include/QtWidgets/qabstractitemview.h \
@@ -670,7 +665,6 @@ moc_mainwindow.cpp: /opt/qt5.7.0_arm/include/QtWidgets/QMainWindow \
 		/opt/qt5.7.0_arm/include/QtWidgets/QPushButton \
 		/opt/qt5.7.0_arm/include/QtWidgets/qpushbutton.h \
 		/opt/qt5.7.0_arm/include/QtWidgets/qabstractbutton.h \
-		/opt/qt5.7.0_arm/include/QtWidgets/QSpacerItem \
 		/opt/qt5.7.0_arm/include/QtWidgets/QWidget \
 		video.h \
 		/usr/local/jpeglib/include/jpeglib.h \
@@ -947,11 +941,6 @@ main.o: main.cpp mainwindow.h \
 		/opt/qt5.7.0_arm/include/QtGui/qinputmethod.h \
 		/opt/qt5.7.0_arm/include/QtWidgets/QButtonGroup \
 		/opt/qt5.7.0_arm/include/QtWidgets/qbuttongroup.h \
-		/opt/qt5.7.0_arm/include/QtWidgets/QHBoxLayout \
-		/opt/qt5.7.0_arm/include/QtWidgets/qboxlayout.h \
-		/opt/qt5.7.0_arm/include/QtWidgets/qlayout.h \
-		/opt/qt5.7.0_arm/include/QtWidgets/qlayoutitem.h \
-		/opt/qt5.7.0_arm/include/QtWidgets/qgridlayout.h \
 		/opt/qt5.7.0_arm/include/QtWidgets/QHeaderView \
 		/opt/qt5.7.0_arm/include/QtWidgets/qheaderview.h \
 		/opt/qt5.7.0_arm/include/QtWidgets/qabstractitemview.h \
@@ -971,7 +960,6 @@ main.o: main.cpp mainwindow.h \
 		/opt/qt5.7.0_arm/include/QtWidgets/QPushButton \
 		/opt/qt5.7.0_arm/include/QtWidgets/qpushbutton.h \
 		/opt/qt5.7.0_arm/include/QtWidgets/qabstractbutton.h \
-		/opt/qt5.7.0_arm/include/QtWidgets/QSpacerItem \
 		/opt/qt5.7.0_arm/include/QtWidgets/QWidget \
 		video.h \
 		/usr/local/jpeglib/include/jpeglib.h \
@@ -1227,11 +1215,6 @@ mainwindow.o: mainwindow.cpp mainwindow.h \
 		/opt/qt5.7.0_arm/include/QtGui/qinputmethod.h \
 		/opt/qt5.7.0_arm/include/QtWidgets/QButtonGroup \
 		/opt/qt5.7.0_arm/include/QtWidgets/qbuttongroup.h \
-		/opt/qt5.7.0_arm/include/QtWidgets/QHBoxLayout \
-		/opt/qt5.7.0_arm/include/QtWidgets/qboxlayout.h \
-		/opt/qt5.7.0_arm/include/QtWidgets/qlayout.h \
-		/opt/qt5.7.0_arm/include/QtWidgets/qlayoutitem.h \
-		/opt/qt5.7.0_arm/include/QtWidgets/qgridlayout.h \
 		/opt/qt5.7.0_arm/include/QtWidgets/QHeaderView \
 		/opt/qt5.7.0_arm/include/QtWidgets/qheaderview.h \
 		/opt/qt5.7.0_arm/include/QtWidgets/qabstractitemview.h \
@@ -1251,7 +1234,6 @@ mainwindow.o: mainwindow.cpp mainwindow.h \
 		/opt/qt5.7.0_arm/include/QtWidgets/QPushButton \
 		/opt/qt5.7.0_arm/include/QtWidgets/qpushbutton.h \
 		/opt/qt5.7.0_arm/include/QtWidgets/qabstractbutton.h \
-		/opt/qt5.7.0_arm/include/QtWidgets/QSpacerItem \
 		/opt/qt5.7.0_arm/include/QtWidgets/QWidget \
 		video.h \
 		/usr/local/jpeglib/include/jpeglib.h \

@@ -52,6 +52,7 @@ class CCamera
         int CCamera_capture(camera_t* camera);
         camera_t* CCamera_OPEN(const char * device,uint32_t width, uint32_t height);
         int convert_yuv_to_rgb_buffer(unsigned char *yuv, unsigned char *rgb, unsigned int width, unsigned int height);
+        void CRgb2Mat(unsigned char *src,Mat &dst,unsigned int width,unsigned int height,unsigned int channels );
 
     private:
         uint8_t* yuyv2rgb(uint8_t* yuyv, uint32_t width, uint32_t height);
