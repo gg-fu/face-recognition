@@ -24,40 +24,41 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 
 SOURCES += \
-        main.cpp \
-        mainwindow.cpp \
-    video.cpp
+        ./src/main.cpp \
+        ./src/mainwindow.cpp \
+    	./src/video.cpp
 
 HEADERS += \
-        mainwindow.h \
-    video.h
+        ./include/mainwindow.h \
+    ./include/video.h
 
 FORMS += \
         mainwindow.ui
 
-INCLUDEPATH += /usr/local/include/opencv \
-               /usr/local/include/opencv2\
-               /usr/local/include\
+INCLUDEPATH += /usr/local/opencv-arm/include/opencv \
+               /usr/local/opencv-arm/include/opencv2\
+               /usr/local/opencv-arm/include\
                /usr/local/jpeglib/include
 
-LIBS += /usr/local/lib/libopencv_core.so
-LIBS += /usr/local/lib/libopencv_highgui.so
-LIBS += /usr/local/lib/libopencv_core.so
-LIBS += /usr/local/lib/libopencv_highgui.so
-LIBS += /usr/local/lib/libopencv_calib3d.so
-LIBS += /usr/local/lib/libopencv_features2d.so
-LIBS += /usr/local/lib/libopencv_flann.so
-LIBS += /usr/local/lib/libopencv_imgcodecs.so
-LIBS += /usr/local/lib/libopencv_imgproc.so
-LIBS += /usr/local/lib/libopencv_ml.so
-LIBS += /usr/local/lib/libopencv_objdetect.so
-LIBS += /usr/local/lib/libopencv_photo.so
-LIBS += /usr/local/lib/libopencv_video.so
-LIBS += /usr/local/lib/libopencv_shape.so
-LIBS += /usr/local/lib/libopencv_videoio.so
-LIBS += /usr/local/lib/libopencv_stitching.so
-LIBS += /usr/local/lib/libopencv_superres.so
+LIBS += /usr/local/opencv-arm/lib/libopencv_core.so
+LIBS += /usr/local/opencv-arm/lib/libopencv_highgui.so
+LIBS += /usr/local/opencv-arm/lib/libopencv_core.so
+LIBS += /usr/local/opencv-arm/lib/libopencv_highgui.so
+LIBS += /usr/local/opencv-arm/lib/libopencv_calib3d.so
+LIBS += /usr/local/opencv-arm/lib/libopencv_features2d.so
+LIBS += /usr/local/opencv-arm/lib/libopencv_flann.so
+LIBS += /usr/local/opencv-arm/lib/libopencv_imgcodecs.so
+LIBS += /usr/local/opencv-arm/lib/libopencv_imgproc.so
+LIBS += /usr/local/opencv-arm/lib/libopencv_ml.so
+LIBS += /usr/local/opencv-arm/lib/libopencv_objdetect.so
+LIBS += /usr/local/opencv-arm/lib/libopencv_photo.so
+LIBS += /usr/local/opencv-arm/lib/libopencv_video.so
+LIBS += /usr/local/opencv-arm/lib/libopencv_shape.so
+LIBS += /usr/local/opencv-arm/lib/libopencv_videoio.so
+LIBS += /usr/local/opencv-arm/lib/libopencv_stitching.so
+LIBS += /usr/local/opencv-arm/lib/libopencv_superres.so
 LIBS += /usr/local/jpeglib/lib/libjpeg.so
+LIBS += /home/bruvin_lu/Camera_new/lib/libncnn.a
 
 
 

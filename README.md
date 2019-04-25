@@ -12,3 +12,4 @@ Each camera has a width * height size allowed to operate, so you need to print t
 
   qmake Camera.pro
   make
+# Camera

@@ -15,7 +15,7 @@ CXX           = arm-none-linux-gnueabi-g++ -Its
 DEFINES       = -DQT_DEPRECATED_WARNINGS -DQT_NO_DEBUG -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB
 CFLAGS        = -pipe -O2 -Wall -W -D_REENTRANT -fPIC $(DEFINES)
 CXXFLAGS      = -pipe -O2 -std=gnu++11 -Wall -W -D_REENTRANT -fPIC $(DEFINES)
-INCPATH       = -I. -I/usr/local/include/opencv -I/usr/local/include/opencv2 -I/usr/local/include -I/usr/local/jpeglib/include -I/opt/qt5.7.0_arm/include -I/opt/qt5.7.0_arm/include/QtWidgets -I/opt/qt5.7.0_arm/include/QtGui -I/opt/qt5.7.0_arm/include/QtCore -I. -I. -I/opt/tslib1.4/include -I/opt/qt5.7.0_arm/mkspecs/linux-arm-gnueabi-g++
+INCPATH       = -I. -I/usr/local/opencv-arm/include/opencv -I/usr/local/opencv-arm/include/opencv2 -I/usr/local/opencv-arm/include -I/usr/local/jpeglib/include -I/opt/qt5.7.0_arm/include -I/opt/qt5.7.0_arm/include/QtWidgets -I/opt/qt5.7.0_arm/include/QtGui -I/opt/qt5.7.0_arm/include/QtCore -I. -I. -I/opt/tslib1.4/include -I/opt/qt5.7.0_arm/mkspecs/linux-arm-gnueabi-g++
 QMAKE         = /opt/qt5.7.0_arm/bin/qmake
 DEL_FILE      = rm -f
 CHK_DIR_EXISTS= test -d
@@ -33,10 +33,10 @@ MOVE          = mv -f
 TAR           = tar -cf
 COMPRESS      = gzip -9f
 DISTNAME      = Camera1.0.0
-DISTDIR = /home/bruvin_lu/Camera/.tmp/Camera1.0.0
+DISTDIR = /home/bruvin_lu/Camera_new/.tmp/Camera1.0.0
 LINK          = arm-none-linux-gnueabi-g++ -Its
 LFLAGS        = -Wl,-O1 -Wl,-rpath,/opt/qt5.7.0_arm/lib
-LIBS          = $(SUBLIBS) -L/opt/tslib1.4/lib /usr/local/lib/libopencv_core.so /usr/local/lib/libopencv_highgui.so /usr/local/lib/libopencv_calib3d.so /usr/local/lib/libopencv_features2d.so /usr/local/lib/libopencv_flann.so /usr/local/lib/libopencv_imgcodecs.so /usr/local/lib/libopencv_imgproc.so /usr/local/lib/libopencv_ml.so /usr/local/lib/libopencv_objdetect.so /usr/local/lib/libopencv_photo.so /usr/local/lib/libopencv_video.so /usr/local/lib/libopencv_shape.so /usr/local/lib/libopencv_videoio.so /usr/local/lib/libopencv_stitching.so /usr/local/lib/libopencv_superres.so /usr/local/jpeglib/lib/libjpeg.so -L/opt/qt5.7.0_arm/lib -lQt5Widgets -L/opt/tslib/lib -lQt5Gui -lQt5Core -lpthread 
+LIBS          = $(SUBLIBS) -L/opt/tslib1.4/lib /usr/local/opencv-arm/lib/libopencv_core.so /usr/local/opencv-arm/lib/libopencv_highgui.so /usr/local/opencv-arm/lib/libopencv_calib3d.so /usr/local/opencv-arm/lib/libopencv_features2d.so /usr/local/opencv-arm/lib/libopencv_flann.so /usr/local/opencv-arm/lib/libopencv_imgcodecs.so /usr/local/opencv-arm/lib/libopencv_imgproc.so /usr/local/opencv-arm/lib/libopencv_ml.so /usr/local/opencv-arm/lib/libopencv_objdetect.so /usr/local/opencv-arm/lib/libopencv_photo.so /usr/local/opencv-arm/lib/libopencv_video.so /usr/local/opencv-arm/lib/libopencv_shape.so /usr/local/opencv-arm/lib/libopencv_videoio.so /usr/local/opencv-arm/lib/libopencv_stitching.so /usr/local/opencv-arm/lib/libopencv_superres.so /usr/local/jpeglib/lib/libjpeg.so /home/bruvin_lu/Camera_new/lib/libncnn.a -L/opt/qt5.7.0_arm/lib -lQt5Widgets -L/opt/tslib/lib -lQt5Gui -lQt5Core -lpthread 
 AR            = arm-none-linux-gnueabi-ar cqs
 RANLIB        = 
 SED           = sed
@@ -48,9 +48,9 @@ OBJECTS_DIR   = ./
 
 ####### Files
 
-SOURCES       = main.cpp \
-		mainwindow.cpp \
-		video.cpp moc_mainwindow.cpp
+SOURCES       = src/main.cpp \
+		src/mainwindow.cpp \
+		src/video.cpp moc_mainwindow.cpp
 OBJECTS       = main.o \
 		mainwindow.o \
 		video.o \
@@ -147,10 +147,10 @@ DIST          = /opt/qt5.7.0_arm/mkspecs/features/spec_pre.prf \
 		/opt/qt5.7.0_arm/mkspecs/features/exceptions.prf \
 		/opt/qt5.7.0_arm/mkspecs/features/yacc.prf \
 		/opt/qt5.7.0_arm/mkspecs/features/lex.prf \
-		Camera.pro mainwindow.h \
-		video.h main.cpp \
-		mainwindow.cpp \
-		video.cpp
+		Camera.pro include/mainwindow.h \
+		include/video.h src/main.cpp \
+		src/mainwindow.cpp \
+		src/video.cpp
 QMAKE_TARGET  = Camera
 DESTDIR       = 
 TARGET        = Camera
@@ -369,8 +369,8 @@ dist: distdir FORCE
 distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
-	$(COPY_FILE) --parents mainwindow.h video.h $(DISTDIR)/
-	$(COPY_FILE) --parents main.cpp mainwindow.cpp video.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents include/mainwindow.h include/video.h $(DISTDIR)/
+	$(COPY_FILE) --parents src/main.cpp src/mainwindow.cpp src/video.cpp $(DISTDIR)/
 	$(COPY_FILE) --parents mainwindow.ui $(DISTDIR)/
 
 
@@ -514,124 +514,6 @@ moc_mainwindow.cpp: /opt/qt5.7.0_arm/include/QtWidgets/QMainWindow \
 		/opt/qt5.7.0_arm/include/QtWidgets/qframe.h \
 		/opt/qt5.7.0_arm/include/QtGui/QImage \
 		/opt/qt5.7.0_arm/include/QtCore/QDebug \
-		/usr/local/include/opencv2/opencv.hpp \
-		/usr/local/include/opencv2/opencv_modules.hpp \
-		/usr/local/include/opencv2/core.hpp \
-		/usr/local/include/opencv2/core/cvdef.h \
-		/usr/local/include/opencv2/core/hal/interface.h \
-		/usr/local/include/opencv2/core/version.hpp \
-		/usr/local/include/opencv2/core/base.hpp \
-		/usr/local/include/opencv2/core/cvstd.hpp \
-		/usr/local/include/opencv2/core/ptr.inl.hpp \
-		/usr/local/include/opencv2/core/neon_utils.hpp \
-		/usr/local/include/opencv2/core/traits.hpp \
-		/usr/local/include/opencv2/core/matx.hpp \
-		/usr/local/include/opencv2/core/saturate.hpp \
-		/usr/local/include/opencv2/core/fast_math.hpp \
-		/usr/local/include/opencv2/core/types.hpp \
-		/usr/local/include/opencv2/core/mat.hpp \
-		/usr/local/include/opencv2/core/bufferpool.hpp \
-		/usr/local/include/opencv2/core/mat.inl.hpp \
-		/usr/local/include/opencv2/core/persistence.hpp \
-		/usr/local/include/opencv2/core/operations.hpp \
-		/usr/local/include/opencv2/core/cvstd.inl.hpp \
-		/usr/local/include/opencv2/core/utility.hpp \
-		/usr/local/include/opencv2/core/core_c.h \
-		/usr/local/include/opencv2/core/types_c.h \
-		/usr/local/include/opencv2/core/optim.hpp \
-		/usr/local/include/opencv2/core/ovx.hpp \
-		/usr/local/include/opencv2/calib3d.hpp \
-		/usr/local/include/opencv2/features2d.hpp \
-		/usr/local/include/opencv2/flann/miniflann.hpp \
-		/usr/local/include/opencv2/flann/defines.h \
-		/usr/local/include/opencv2/flann/config.h \
-		/usr/local/include/opencv2/core/affine.hpp \
-		/usr/local/include/opencv2/calib3d/calib3d_c.h \
-		/usr/local/include/opencv2/flann.hpp \
-		/usr/local/include/opencv2/flann/flann_base.hpp \
-		/usr/local/include/opencv2/flann/general.h \
-		/usr/local/include/opencv2/flann/matrix.h \
-		/usr/local/include/opencv2/flann/params.h \
-		/usr/local/include/opencv2/flann/any.h \
-		/usr/local/include/opencv2/flann/saving.h \
-		/usr/local/include/opencv2/flann/nn_index.h \
-		/usr/local/include/opencv2/flann/result_set.h \
-		/usr/local/include/opencv2/flann/all_indices.h \
-		/usr/local/include/opencv2/flann/kdtree_index.h \
-		/usr/local/include/opencv2/flann/dynamic_bitset.h \
-		/usr/local/include/opencv2/flann/dist.h \
-		/usr/local/include/opencv2/flann/heap.h \
-		/usr/local/include/opencv2/flann/allocator.h \
-		/usr/local/include/opencv2/flann/random.h \
-		/usr/local/include/opencv2/flann/kdtree_single_index.h \
-		/usr/local/include/opencv2/flann/kmeans_index.h \
-		/usr/local/include/opencv2/flann/logger.h \
-		/usr/local/include/opencv2/flann/composite_index.h \
-		/usr/local/include/opencv2/flann/linear_index.h \
-		/usr/local/include/opencv2/flann/hierarchical_clustering_index.h \
-		/usr/local/include/opencv2/flann/lsh_index.h \
-		/usr/local/include/opencv2/flann/lsh_table.h \
-		/usr/local/include/opencv2/flann/autotuned_index.h \
-		/usr/local/include/opencv2/flann/ground_truth.h \
-		/usr/local/include/opencv2/flann/index_testing.h \
-		/usr/local/include/opencv2/flann/timer.h \
-		/usr/local/include/opencv2/flann/sampling.h \
-		/usr/local/include/opencv2/highgui.hpp \
-		/usr/local/include/opencv2/imgcodecs.hpp \
-		/usr/local/include/opencv2/videoio.hpp \
-		/usr/local/include/opencv2/highgui/highgui_c.h \
-		/usr/local/include/opencv2/imgproc/imgproc_c.h \
-		/usr/local/include/opencv2/imgproc/types_c.h \
-		/usr/local/include/opencv2/imgcodecs/imgcodecs_c.h \
-		/usr/local/include/opencv2/videoio/videoio_c.h \
-		/usr/local/include/opencv2/imgproc.hpp \
-		/usr/local/include/opencv2/ml.hpp \
-		/usr/local/include/opencv2/objdetect.hpp \
-		/usr/local/include/opencv2/objdetect/detection_based_tracker.hpp \
-		/usr/local/include/opencv2/objdetect/objdetect_c.h \
-		/usr/local/include/opencv2/photo.hpp \
-		/usr/local/include/opencv2/photo/photo_c.h \
-		/usr/local/include/opencv2/shape.hpp \
-		/usr/local/include/opencv2/shape/emdL1.hpp \
-		/usr/local/include/opencv2/shape/shape_transformer.hpp \
-		/usr/local/include/opencv2/shape/hist_cost.hpp \
-		/usr/local/include/opencv2/shape/shape_distance.hpp \
-		/usr/local/include/opencv2/stitching.hpp \
-		/usr/local/include/opencv2/stitching/warpers.hpp \
-		/usr/local/include/opencv2/stitching/detail/warpers.hpp \
-		/usr/local/include/opencv2/core/cuda.hpp \
-		/usr/local/include/opencv2/core/cuda_types.hpp \
-		/usr/local/include/opencv2/core/cuda.inl.hpp \
-		/usr/local/include/opencv2/stitching/detail/warpers_inl.hpp \
-		/usr/local/include/opencv2/stitching/detail/matchers.hpp \
-		/usr/local/include/opencv2/stitching/detail/motion_estimators.hpp \
-		/usr/local/include/opencv2/stitching/detail/util.hpp \
-		/usr/local/include/opencv2/stitching/detail/util_inl.hpp \
-		/usr/local/include/opencv2/stitching/detail/camera.hpp \
-		/usr/local/include/opencv2/stitching/detail/exposure_compensate.hpp \
-		/usr/local/include/opencv2/stitching/detail/seam_finders.hpp \
-		/usr/local/include/opencv2/stitching/detail/blenders.hpp \
-		/usr/local/include/opencv2/superres.hpp \
-		/usr/local/include/opencv2/superres/optical_flow.hpp \
-		/usr/local/include/opencv2/video.hpp \
-		/usr/local/include/opencv2/video/tracking.hpp \
-		/usr/local/include/opencv2/video/background_segm.hpp \
-		/usr/local/include/opencv2/video/tracking_c.h \
-		/usr/local/include/opencv2/videostab.hpp \
-		/usr/local/include/opencv2/videostab/stabilizer.hpp \
-		/usr/local/include/opencv2/videostab/global_motion.hpp \
-		/usr/local/include/opencv2/videostab/optical_flow.hpp \
-		/usr/local/include/opencv2/videostab/motion_core.hpp \
-		/usr/local/include/opencv2/videostab/outlier_rejection.hpp \
-		/usr/local/include/opencv2/videostab/motion_stabilizing.hpp \
-		/usr/local/include/opencv2/videostab/frame_source.hpp \
-		/usr/local/include/opencv2/videostab/log.hpp \
-		/usr/local/include/opencv2/videostab/inpainting.hpp \
-		/usr/local/include/opencv2/videostab/fast_marching.hpp \
-		/usr/local/include/opencv2/videostab/fast_marching_inl.hpp \
-		/usr/local/include/opencv2/videostab/deblurring.hpp \
-		/usr/local/include/opencv2/videostab/wobble_suppression.hpp \
-		/usr/local/include/opencv2/videostab/ring_buffer.hpp \
 		ui_mainwindow.h \
 		/opt/qt5.7.0_arm/include/QtCore/QVariant \
 		/opt/qt5.7.0_arm/include/QtWidgets/QAction \
@@ -666,14 +548,57 @@ moc_mainwindow.cpp: /opt/qt5.7.0_arm/include/QtWidgets/QMainWindow \
 		/opt/qt5.7.0_arm/include/QtWidgets/qpushbutton.h \
 		/opt/qt5.7.0_arm/include/QtWidgets/qabstractbutton.h \
 		/opt/qt5.7.0_arm/include/QtWidgets/QWidget \
-		video.h \
+		include/video.h \
 		/usr/local/jpeglib/include/jpeglib.h \
 		/usr/local/jpeglib/include/jconfig.h \
 		/usr/local/jpeglib/include/jmorecfg.h \
 		/usr/local/jpeglib/include/jerror.h \
-		mainwindow.h \
+		/usr/local/opencv-arm/include/opencv2/highgui.hpp \
+		/usr/local/opencv-arm/include/opencv2/core.hpp \
+		/usr/local/opencv-arm/include/opencv2/core/cvdef.h \
+		/usr/local/opencv-arm/include/opencv2/core/hal/interface.h \
+		/usr/local/opencv-arm/include/opencv2/core/version.hpp \
+		/usr/local/opencv-arm/include/opencv2/core/base.hpp \
+		/usr/local/opencv-arm/include/opencv2/opencv_modules.hpp \
+		/usr/local/opencv-arm/include/opencv2/core/cvstd.hpp \
+		/usr/local/opencv-arm/include/opencv2/core/ptr.inl.hpp \
+		/usr/local/opencv-arm/include/opencv2/core/neon_utils.hpp \
+		/usr/local/opencv-arm/include/opencv2/core/traits.hpp \
+		/usr/local/opencv-arm/include/opencv2/core/matx.hpp \
+		/usr/local/opencv-arm/include/opencv2/core/saturate.hpp \
+		/usr/local/opencv-arm/include/opencv2/core/fast_math.hpp \
+		/usr/local/opencv-arm/include/opencv2/core/types.hpp \
+		/usr/local/opencv-arm/include/opencv2/core/mat.hpp \
+		/usr/local/opencv-arm/include/opencv2/core/bufferpool.hpp \
+		/usr/local/opencv-arm/include/opencv2/core/mat.inl.hpp \
+		/usr/local/opencv-arm/include/opencv2/core/persistence.hpp \
+		/usr/local/opencv-arm/include/opencv2/core/operations.hpp \
+		/usr/local/opencv-arm/include/opencv2/core/cvstd.inl.hpp \
+		/usr/local/opencv-arm/include/opencv2/core/utility.hpp \
+		/usr/local/opencv-arm/include/opencv2/core/core_c.h \
+		/usr/local/opencv-arm/include/opencv2/core/types_c.h \
+		/usr/local/opencv-arm/include/opencv2/core/optim.hpp \
+		/usr/local/opencv-arm/include/opencv2/core/ovx.hpp \
+		/usr/local/opencv-arm/include/opencv2/imgcodecs.hpp \
+		/usr/local/opencv-arm/include/opencv2/videoio.hpp \
+		/usr/local/opencv-arm/include/opencv2/highgui/highgui_c.h \
+		/usr/local/opencv-arm/include/opencv2/imgproc/imgproc_c.h \
+		/usr/local/opencv-arm/include/opencv2/imgproc/types_c.h \
+		/usr/local/opencv-arm/include/opencv2/imgcodecs/imgcodecs_c.h \
+		/usr/local/opencv-arm/include/opencv2/videoio/videoio_c.h \
+		/usr/local/opencv-arm/include/opencv2/core/core.hpp \
+		/usr/local/opencv-arm/include/opencv2/highgui/highgui.hpp \
+		/usr/local/opencv-arm/include/opencv2/imgproc/imgproc.hpp \
+		/usr/local/opencv-arm/include/opencv2/imgproc.hpp \
+		include/net.h \
+		include/blob.h \
+		include/platform.h \
+		include/layer.h \
+		include/mat.h \
+		include/paramdict.h \
+		include/mainwindow.h \
 		/opt/qt5.7.0_arm/bin/moc
-	/opt/qt5.7.0_arm/bin/moc $(DEFINES) -I/opt/qt5.7.0_arm/mkspecs/linux-arm-gnueabi-g++ -I/home/bruvin_lu/Camera -I/usr/local/include/opencv -I/usr/local/include/opencv2 -I/usr/local/include -I/usr/local/jpeglib/include -I/opt/qt5.7.0_arm/include -I/opt/qt5.7.0_arm/include/QtWidgets -I/opt/qt5.7.0_arm/include/QtGui -I/opt/qt5.7.0_arm/include/QtCore -I/opt/arm-2014.05/arm-none-linux-gnueabi/include/c++/4.8.3 -I/opt/arm-2014.05/arm-none-linux-gnueabi/include/c++/4.8.3/arm-none-linux-gnueabi -I/opt/arm-2014.05/arm-none-linux-gnueabi/include/c++/4.8.3/backward -I/opt/arm-2014.05/lib/gcc/arm-none-linux-gnueabi/4.8.3/include -I/opt/arm-2014.05/lib/gcc/arm-none-linux-gnueabi/4.8.3/include-fixed -I/opt/arm-2014.05/arm-none-linux-gnueabi/include -I/opt/arm-2014.05/arm-none-linux-gnueabi/libc/usr/include mainwindow.h -o moc_mainwindow.cpp
+	/opt/qt5.7.0_arm/bin/moc $(DEFINES) -I/opt/qt5.7.0_arm/mkspecs/linux-arm-gnueabi-g++ -I/home/bruvin_lu/Camera_new -I/usr/local/opencv-arm/include/opencv -I/usr/local/opencv-arm/include/opencv2 -I/usr/local/opencv-arm/include -I/usr/local/jpeglib/include -I/opt/qt5.7.0_arm/include -I/opt/qt5.7.0_arm/include/QtWidgets -I/opt/qt5.7.0_arm/include/QtGui -I/opt/qt5.7.0_arm/include/QtCore -I/opt/arm-2014.05/arm-none-linux-gnueabi/include/c++/4.8.3 -I/opt/arm-2014.05/arm-none-linux-gnueabi/include/c++/4.8.3/arm-none-linux-gnueabi -I/opt/arm-2014.05/arm-none-linux-gnueabi/include/c++/4.8.3/backward -I/opt/arm-2014.05/lib/gcc/arm-none-linux-gnueabi/4.8.3/include -I/opt/arm-2014.05/lib/gcc/arm-none-linux-gnueabi/4.8.3/include-fixed -I/opt/arm-2014.05/arm-none-linux-gnueabi/include -I/opt/arm-2014.05/arm-none-linux-gnueabi/libc/usr/include include/mainwindow.h -o moc_mainwindow.cpp
 
 compiler_moc_source_make_all:
 compiler_moc_source_clean:
@@ -694,11 +619,9 @@ compiler_clean: compiler_moc_header_clean compiler_uic_clean
 
 ####### Compile
 
-main.o: main.cpp mainwindow.h \
-		/opt/qt5.7.0_arm/include/QtWidgets/QMainWindow \
-		/opt/qt5.7.0_arm/include/QtWidgets/qmainwindow.h \
-		/opt/qt5.7.0_arm/include/QtWidgets/qwidget.h \
-		/opt/qt5.7.0_arm/include/QtGui/qwindowdefs.h \
+main.o: src/main.cpp /opt/qt5.7.0_arm/include/QtWidgets/QApplication \
+		/opt/qt5.7.0_arm/include/QtWidgets/qapplication.h \
+		/opt/qt5.7.0_arm/include/QtCore/qcoreapplication.h \
 		/opt/qt5.7.0_arm/include/QtCore/qglobal.h \
 		/opt/qt5.7.0_arm/include/QtCore/qconfig.h \
 		/opt/qt5.7.0_arm/include/QtCore/qfeatures.h \
@@ -721,17 +644,16 @@ main.o: main.cpp mainwindow.h \
 		/opt/qt5.7.0_arm/include/QtCore/qmutex.h \
 		/opt/qt5.7.0_arm/include/QtCore/qnumeric.h \
 		/opt/qt5.7.0_arm/include/QtCore/qversiontagging.h \
-		/opt/qt5.7.0_arm/include/QtCore/qobjectdefs.h \
-		/opt/qt5.7.0_arm/include/QtCore/qnamespace.h \
-		/opt/qt5.7.0_arm/include/QtCore/qobjectdefs_impl.h \
-		/opt/qt5.7.0_arm/include/QtGui/qwindowdefs_win.h \
-		/opt/qt5.7.0_arm/include/QtCore/qobject.h \
 		/opt/qt5.7.0_arm/include/QtCore/qstring.h \
 		/opt/qt5.7.0_arm/include/QtCore/qchar.h \
 		/opt/qt5.7.0_arm/include/QtCore/qbytearray.h \
 		/opt/qt5.7.0_arm/include/QtCore/qrefcount.h \
+		/opt/qt5.7.0_arm/include/QtCore/qnamespace.h \
 		/opt/qt5.7.0_arm/include/QtCore/qarraydata.h \
 		/opt/qt5.7.0_arm/include/QtCore/qstringbuilder.h \
+		/opt/qt5.7.0_arm/include/QtCore/qobject.h \
+		/opt/qt5.7.0_arm/include/QtCore/qobjectdefs.h \
+		/opt/qt5.7.0_arm/include/QtCore/qobjectdefs_impl.h \
 		/opt/qt5.7.0_arm/include/QtCore/qlist.h \
 		/opt/qt5.7.0_arm/include/QtCore/qalgorithms.h \
 		/opt/qt5.7.0_arm/include/QtCore/qiterator.h \
@@ -747,11 +669,17 @@ main.o: main.cpp mainwindow.h \
 		/opt/qt5.7.0_arm/include/QtCore/qvarlengtharray.h \
 		/opt/qt5.7.0_arm/include/QtCore/qcontainerfwd.h \
 		/opt/qt5.7.0_arm/include/QtCore/qobject_impl.h \
+		/opt/qt5.7.0_arm/include/QtCore/qeventloop.h \
+		/opt/qt5.7.0_arm/include/QtGui/qwindowdefs.h \
+		/opt/qt5.7.0_arm/include/QtGui/qwindowdefs_win.h \
+		/opt/qt5.7.0_arm/include/QtCore/qpoint.h \
+		/opt/qt5.7.0_arm/include/QtCore/qsize.h \
+		/opt/qt5.7.0_arm/include/QtGui/qcursor.h \
+		/opt/qt5.7.0_arm/include/QtWidgets/qdesktopwidget.h \
+		/opt/qt5.7.0_arm/include/QtWidgets/qwidget.h \
 		/opt/qt5.7.0_arm/include/QtCore/qmargins.h \
 		/opt/qt5.7.0_arm/include/QtGui/qpaintdevice.h \
 		/opt/qt5.7.0_arm/include/QtCore/qrect.h \
-		/opt/qt5.7.0_arm/include/QtCore/qsize.h \
-		/opt/qt5.7.0_arm/include/QtCore/qpoint.h \
 		/opt/qt5.7.0_arm/include/QtGui/qpalette.h \
 		/opt/qt5.7.0_arm/include/QtGui/qcolor.h \
 		/opt/qt5.7.0_arm/include/QtGui/qrgb.h \
@@ -777,7 +705,6 @@ main.o: main.cpp mainwindow.h \
 		/opt/qt5.7.0_arm/include/QtGui/qfontmetrics.h \
 		/opt/qt5.7.0_arm/include/QtGui/qfontinfo.h \
 		/opt/qt5.7.0_arm/include/QtWidgets/qsizepolicy.h \
-		/opt/qt5.7.0_arm/include/QtGui/qcursor.h \
 		/opt/qt5.7.0_arm/include/QtGui/qkeysequence.h \
 		/opt/qt5.7.0_arm/include/QtGui/qevent.h \
 		/opt/qt5.7.0_arm/include/QtCore/qvariant.h \
@@ -793,186 +720,14 @@ main.o: main.cpp mainwindow.h \
 		/opt/qt5.7.0_arm/include/QtCore/qfiledevice.h \
 		/opt/qt5.7.0_arm/include/QtGui/qvector2d.h \
 		/opt/qt5.7.0_arm/include/QtGui/qtouchdevice.h \
-		/opt/qt5.7.0_arm/include/QtWidgets/qtabwidget.h \
-		/opt/qt5.7.0_arm/include/QtGui/qicon.h \
-		/opt/qt5.7.0_arm/include/QtGui/QPaintEvent \
-		/opt/qt5.7.0_arm/include/QtCore/QTimer \
-		/opt/qt5.7.0_arm/include/QtCore/qtimer.h \
-		/opt/qt5.7.0_arm/include/QtCore/qbasictimer.h \
-		/opt/qt5.7.0_arm/include/QtGui/QPainter \
-		/opt/qt5.7.0_arm/include/QtGui/qpainter.h \
-		/opt/qt5.7.0_arm/include/QtGui/qtextoption.h \
-		/opt/qt5.7.0_arm/include/QtGui/qpen.h \
-		/opt/qt5.7.0_arm/include/QtGui/QPixmap \
-		/opt/qt5.7.0_arm/include/QtWidgets/QLabel \
-		/opt/qt5.7.0_arm/include/QtWidgets/qlabel.h \
-		/opt/qt5.7.0_arm/include/QtWidgets/qframe.h \
-		/opt/qt5.7.0_arm/include/QtGui/QImage \
-		/opt/qt5.7.0_arm/include/QtCore/QDebug \
-		/usr/local/include/opencv2/opencv.hpp \
-		/usr/local/include/opencv2/opencv_modules.hpp \
-		/usr/local/include/opencv2/core.hpp \
-		/usr/local/include/opencv2/core/cvdef.h \
-		/usr/local/include/opencv2/core/hal/interface.h \
-		/usr/local/include/opencv2/core/version.hpp \
-		/usr/local/include/opencv2/core/base.hpp \
-		/usr/local/include/opencv2/core/cvstd.hpp \
-		/usr/local/include/opencv2/core/ptr.inl.hpp \
-		/usr/local/include/opencv2/core/neon_utils.hpp \
-		/usr/local/include/opencv2/core/traits.hpp \
-		/usr/local/include/opencv2/core/matx.hpp \
-		/usr/local/include/opencv2/core/saturate.hpp \
-		/usr/local/include/opencv2/core/fast_math.hpp \
-		/usr/local/include/opencv2/core/types.hpp \
-		/usr/local/include/opencv2/core/mat.hpp \
-		/usr/local/include/opencv2/core/bufferpool.hpp \
-		/usr/local/include/opencv2/core/mat.inl.hpp \
-		/usr/local/include/opencv2/core/persistence.hpp \
-		/usr/local/include/opencv2/core/operations.hpp \
-		/usr/local/include/opencv2/core/cvstd.inl.hpp \
-		/usr/local/include/opencv2/core/utility.hpp \
-		/usr/local/include/opencv2/core/core_c.h \
-		/usr/local/include/opencv2/core/types_c.h \
-		/usr/local/include/opencv2/core/optim.hpp \
-		/usr/local/include/opencv2/core/ovx.hpp \
-		/usr/local/include/opencv2/calib3d.hpp \
-		/usr/local/include/opencv2/features2d.hpp \
-		/usr/local/include/opencv2/flann/miniflann.hpp \
-		/usr/local/include/opencv2/flann/defines.h \
-		/usr/local/include/opencv2/flann/config.h \
-		/usr/local/include/opencv2/core/affine.hpp \
-		/usr/local/include/opencv2/calib3d/calib3d_c.h \
-		/usr/local/include/opencv2/flann.hpp \
-		/usr/local/include/opencv2/flann/flann_base.hpp \
-		/usr/local/include/opencv2/flann/general.h \
-		/usr/local/include/opencv2/flann/matrix.h \
-		/usr/local/include/opencv2/flann/params.h \
-		/usr/local/include/opencv2/flann/any.h \
-		/usr/local/include/opencv2/flann/saving.h \
-		/usr/local/include/opencv2/flann/nn_index.h \
-		/usr/local/include/opencv2/flann/result_set.h \
-		/usr/local/include/opencv2/flann/all_indices.h \
-		/usr/local/include/opencv2/flann/kdtree_index.h \
-		/usr/local/include/opencv2/flann/dynamic_bitset.h \
-		/usr/local/include/opencv2/flann/dist.h \
-		/usr/local/include/opencv2/flann/heap.h \
-		/usr/local/include/opencv2/flann/allocator.h \
-		/usr/local/include/opencv2/flann/random.h \
-		/usr/local/include/opencv2/flann/kdtree_single_index.h \
-		/usr/local/include/opencv2/flann/kmeans_index.h \
-		/usr/local/include/opencv2/flann/logger.h \
-		/usr/local/include/opencv2/flann/composite_index.h \
-		/usr/local/include/opencv2/flann/linear_index.h \
-		/usr/local/include/opencv2/flann/hierarchical_clustering_index.h \
-		/usr/local/include/opencv2/flann/lsh_index.h \
-		/usr/local/include/opencv2/flann/lsh_table.h \
-		/usr/local/include/opencv2/flann/autotuned_index.h \
-		/usr/local/include/opencv2/flann/ground_truth.h \
-		/usr/local/include/opencv2/flann/index_testing.h \
-		/usr/local/include/opencv2/flann/timer.h \
-		/usr/local/include/opencv2/flann/sampling.h \
-		/usr/local/include/opencv2/highgui.hpp \
-		/usr/local/include/opencv2/imgcodecs.hpp \
-		/usr/local/include/opencv2/videoio.hpp \
-		/usr/local/include/opencv2/highgui/highgui_c.h \
-		/usr/local/include/opencv2/imgproc/imgproc_c.h \
-		/usr/local/include/opencv2/imgproc/types_c.h \
-		/usr/local/include/opencv2/imgcodecs/imgcodecs_c.h \
-		/usr/local/include/opencv2/videoio/videoio_c.h \
-		/usr/local/include/opencv2/imgproc.hpp \
-		/usr/local/include/opencv2/ml.hpp \
-		/usr/local/include/opencv2/objdetect.hpp \
-		/usr/local/include/opencv2/objdetect/detection_based_tracker.hpp \
-		/usr/local/include/opencv2/objdetect/objdetect_c.h \
-		/usr/local/include/opencv2/photo.hpp \
-		/usr/local/include/opencv2/photo/photo_c.h \
-		/usr/local/include/opencv2/shape.hpp \
-		/usr/local/include/opencv2/shape/emdL1.hpp \
-		/usr/local/include/opencv2/shape/shape_transformer.hpp \
-		/usr/local/include/opencv2/shape/hist_cost.hpp \
-		/usr/local/include/opencv2/shape/shape_distance.hpp \
-		/usr/local/include/opencv2/stitching.hpp \
-		/usr/local/include/opencv2/stitching/warpers.hpp \
-		/usr/local/include/opencv2/stitching/detail/warpers.hpp \
-		/usr/local/include/opencv2/core/cuda.hpp \
-		/usr/local/include/opencv2/core/cuda_types.hpp \
-		/usr/local/include/opencv2/core/cuda.inl.hpp \
-		/usr/local/include/opencv2/stitching/detail/warpers_inl.hpp \
-		/usr/local/include/opencv2/stitching/detail/matchers.hpp \
-		/usr/local/include/opencv2/stitching/detail/motion_estimators.hpp \
-		/usr/local/include/opencv2/stitching/detail/util.hpp \
-		/usr/local/include/opencv2/stitching/detail/util_inl.hpp \
-		/usr/local/include/opencv2/stitching/detail/camera.hpp \
-		/usr/local/include/opencv2/stitching/detail/exposure_compensate.hpp \
-		/usr/local/include/opencv2/stitching/detail/seam_finders.hpp \
-		/usr/local/include/opencv2/stitching/detail/blenders.hpp \
-		/usr/local/include/opencv2/superres.hpp \
-		/usr/local/include/opencv2/superres/optical_flow.hpp \
-		/usr/local/include/opencv2/video.hpp \
-		/usr/local/include/opencv2/video/tracking.hpp \
-		/usr/local/include/opencv2/video/background_segm.hpp \
-		/usr/local/include/opencv2/video/tracking_c.h \
-		/usr/local/include/opencv2/videostab.hpp \
-		/usr/local/include/opencv2/videostab/stabilizer.hpp \
-		/usr/local/include/opencv2/videostab/global_motion.hpp \
-		/usr/local/include/opencv2/videostab/optical_flow.hpp \
-		/usr/local/include/opencv2/videostab/motion_core.hpp \
-		/usr/local/include/opencv2/videostab/outlier_rejection.hpp \
-		/usr/local/include/opencv2/videostab/motion_stabilizing.hpp \
-		/usr/local/include/opencv2/videostab/frame_source.hpp \
-		/usr/local/include/opencv2/videostab/log.hpp \
-		/usr/local/include/opencv2/videostab/inpainting.hpp \
-		/usr/local/include/opencv2/videostab/fast_marching.hpp \
-		/usr/local/include/opencv2/videostab/fast_marching_inl.hpp \
-		/usr/local/include/opencv2/videostab/deblurring.hpp \
-		/usr/local/include/opencv2/videostab/wobble_suppression.hpp \
-		/usr/local/include/opencv2/videostab/ring_buffer.hpp \
-		ui_mainwindow.h \
-		/opt/qt5.7.0_arm/include/QtCore/QVariant \
-		/opt/qt5.7.0_arm/include/QtWidgets/QAction \
-		/opt/qt5.7.0_arm/include/QtWidgets/qaction.h \
-		/opt/qt5.7.0_arm/include/QtWidgets/qactiongroup.h \
-		/opt/qt5.7.0_arm/include/QtWidgets/QApplication \
-		/opt/qt5.7.0_arm/include/QtWidgets/qapplication.h \
-		/opt/qt5.7.0_arm/include/QtCore/qcoreapplication.h \
-		/opt/qt5.7.0_arm/include/QtCore/qeventloop.h \
-		/opt/qt5.7.0_arm/include/QtWidgets/qdesktopwidget.h \
 		/opt/qt5.7.0_arm/include/QtGui/qguiapplication.h \
-		/opt/qt5.7.0_arm/include/QtGui/qinputmethod.h \
-		/opt/qt5.7.0_arm/include/QtWidgets/QButtonGroup \
-		/opt/qt5.7.0_arm/include/QtWidgets/qbuttongroup.h \
-		/opt/qt5.7.0_arm/include/QtWidgets/QHeaderView \
-		/opt/qt5.7.0_arm/include/QtWidgets/qheaderview.h \
-		/opt/qt5.7.0_arm/include/QtWidgets/qabstractitemview.h \
-		/opt/qt5.7.0_arm/include/QtWidgets/qabstractscrollarea.h \
-		/opt/qt5.7.0_arm/include/QtCore/qabstractitemmodel.h \
-		/opt/qt5.7.0_arm/include/QtCore/qitemselectionmodel.h \
-		/opt/qt5.7.0_arm/include/QtWidgets/qabstractitemdelegate.h \
-		/opt/qt5.7.0_arm/include/QtWidgets/qstyleoption.h \
-		/opt/qt5.7.0_arm/include/QtWidgets/qabstractspinbox.h \
-		/opt/qt5.7.0_arm/include/QtGui/qvalidator.h \
-		/opt/qt5.7.0_arm/include/QtCore/qregularexpression.h \
-		/opt/qt5.7.0_arm/include/QtWidgets/qslider.h \
-		/opt/qt5.7.0_arm/include/QtWidgets/qabstractslider.h \
-		/opt/qt5.7.0_arm/include/QtWidgets/qstyle.h \
-		/opt/qt5.7.0_arm/include/QtWidgets/qtabbar.h \
-		/opt/qt5.7.0_arm/include/QtWidgets/qrubberband.h \
-		/opt/qt5.7.0_arm/include/QtWidgets/QPushButton \
-		/opt/qt5.7.0_arm/include/QtWidgets/qpushbutton.h \
-		/opt/qt5.7.0_arm/include/QtWidgets/qabstractbutton.h \
-		/opt/qt5.7.0_arm/include/QtWidgets/QWidget \
-		video.h \
-		/usr/local/jpeglib/include/jpeglib.h \
-		/usr/local/jpeglib/include/jconfig.h \
-		/usr/local/jpeglib/include/jmorecfg.h \
-		/usr/local/jpeglib/include/jerror.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o main.cpp
+		/opt/qt5.7.0_arm/include/QtGui/qinputmethod.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o src/main.cpp
 
-mainwindow.o: mainwindow.cpp mainwindow.h \
-		/opt/qt5.7.0_arm/include/QtWidgets/QMainWindow \
-		/opt/qt5.7.0_arm/include/QtWidgets/qmainwindow.h \
-		/opt/qt5.7.0_arm/include/QtWidgets/qwidget.h \
-		/opt/qt5.7.0_arm/include/QtGui/qwindowdefs.h \
+mainwindow.o: src/mainwindow.cpp ui_mainwindow.h \
+		/opt/qt5.7.0_arm/include/QtCore/QVariant \
+		/opt/qt5.7.0_arm/include/QtCore/qvariant.h \
+		/opt/qt5.7.0_arm/include/QtCore/qatomic.h \
 		/opt/qt5.7.0_arm/include/QtCore/qglobal.h \
 		/opt/qt5.7.0_arm/include/QtCore/qconfig.h \
 		/opt/qt5.7.0_arm/include/QtCore/qfeatures.h \
@@ -985,26 +740,21 @@ mainwindow.o: mainwindow.cpp mainwindow.h \
 		/opt/qt5.7.0_arm/include/QtCore/qsysinfo.h \
 		/opt/qt5.7.0_arm/include/QtCore/qlogging.h \
 		/opt/qt5.7.0_arm/include/QtCore/qflags.h \
-		/opt/qt5.7.0_arm/include/QtCore/qatomic.h \
+		/opt/qt5.7.0_arm/include/QtCore/qglobalstatic.h \
+		/opt/qt5.7.0_arm/include/QtCore/qmutex.h \
+		/opt/qt5.7.0_arm/include/QtCore/qnumeric.h \
+		/opt/qt5.7.0_arm/include/QtCore/qversiontagging.h \
 		/opt/qt5.7.0_arm/include/QtCore/qbasicatomic.h \
 		/opt/qt5.7.0_arm/include/QtCore/qatomic_bootstrap.h \
 		/opt/qt5.7.0_arm/include/QtCore/qgenericatomic.h \
 		/opt/qt5.7.0_arm/include/QtCore/qatomic_cxx11.h \
 		/opt/qt5.7.0_arm/include/QtCore/qatomic_msvc.h \
-		/opt/qt5.7.0_arm/include/QtCore/qglobalstatic.h \
-		/opt/qt5.7.0_arm/include/QtCore/qmutex.h \
-		/opt/qt5.7.0_arm/include/QtCore/qnumeric.h \
-		/opt/qt5.7.0_arm/include/QtCore/qversiontagging.h \
-		/opt/qt5.7.0_arm/include/QtCore/qobjectdefs.h \
-		/opt/qt5.7.0_arm/include/QtCore/qnamespace.h \
-		/opt/qt5.7.0_arm/include/QtCore/qobjectdefs_impl.h \
-		/opt/qt5.7.0_arm/include/QtGui/qwindowdefs_win.h \
-		/opt/qt5.7.0_arm/include/QtCore/qobject.h \
-		/opt/qt5.7.0_arm/include/QtCore/qstring.h \
-		/opt/qt5.7.0_arm/include/QtCore/qchar.h \
 		/opt/qt5.7.0_arm/include/QtCore/qbytearray.h \
 		/opt/qt5.7.0_arm/include/QtCore/qrefcount.h \
+		/opt/qt5.7.0_arm/include/QtCore/qnamespace.h \
 		/opt/qt5.7.0_arm/include/QtCore/qarraydata.h \
+		/opt/qt5.7.0_arm/include/QtCore/qstring.h \
+		/opt/qt5.7.0_arm/include/QtCore/qchar.h \
 		/opt/qt5.7.0_arm/include/QtCore/qstringbuilder.h \
 		/opt/qt5.7.0_arm/include/QtCore/qlist.h \
 		/opt/qt5.7.0_arm/include/QtCore/qalgorithms.h \
@@ -1015,196 +765,66 @@ mainwindow.o: mainwindow.cpp mainwindow.h \
 		/opt/qt5.7.0_arm/include/QtCore/qstringlist.h \
 		/opt/qt5.7.0_arm/include/QtCore/qregexp.h \
 		/opt/qt5.7.0_arm/include/QtCore/qstringmatcher.h \
-		/opt/qt5.7.0_arm/include/QtCore/qcoreevent.h \
-		/opt/qt5.7.0_arm/include/QtCore/qscopedpointer.h \
 		/opt/qt5.7.0_arm/include/QtCore/qmetatype.h \
 		/opt/qt5.7.0_arm/include/QtCore/qvarlengtharray.h \
 		/opt/qt5.7.0_arm/include/QtCore/qcontainerfwd.h \
+		/opt/qt5.7.0_arm/include/QtCore/qobjectdefs.h \
+		/opt/qt5.7.0_arm/include/QtCore/qobjectdefs_impl.h \
+		/opt/qt5.7.0_arm/include/QtCore/qmap.h \
+		/opt/qt5.7.0_arm/include/QtCore/qdebug.h \
+		/opt/qt5.7.0_arm/include/QtCore/qhash.h \
+		/opt/qt5.7.0_arm/include/QtCore/qtextstream.h \
+		/opt/qt5.7.0_arm/include/QtCore/qiodevice.h \
+		/opt/qt5.7.0_arm/include/QtCore/qobject.h \
+		/opt/qt5.7.0_arm/include/QtCore/qcoreevent.h \
+		/opt/qt5.7.0_arm/include/QtCore/qscopedpointer.h \
 		/opt/qt5.7.0_arm/include/QtCore/qobject_impl.h \
+		/opt/qt5.7.0_arm/include/QtCore/qlocale.h \
+		/opt/qt5.7.0_arm/include/QtCore/qshareddata.h \
+		/opt/qt5.7.0_arm/include/QtCore/qvector.h \
+		/opt/qt5.7.0_arm/include/QtCore/qpoint.h \
+		/opt/qt5.7.0_arm/include/QtCore/qset.h \
+		/opt/qt5.7.0_arm/include/QtCore/qcontiguouscache.h \
+		/opt/qt5.7.0_arm/include/QtCore/qsharedpointer.h \
+		/opt/qt5.7.0_arm/include/QtCore/qsharedpointer_impl.h \
+		/opt/qt5.7.0_arm/include/QtWidgets/QAction \
+		/opt/qt5.7.0_arm/include/QtWidgets/qaction.h \
+		/opt/qt5.7.0_arm/include/QtGui/qkeysequence.h \
+		/opt/qt5.7.0_arm/include/QtWidgets/qwidget.h \
+		/opt/qt5.7.0_arm/include/QtGui/qwindowdefs.h \
+		/opt/qt5.7.0_arm/include/QtGui/qwindowdefs_win.h \
 		/opt/qt5.7.0_arm/include/QtCore/qmargins.h \
 		/opt/qt5.7.0_arm/include/QtGui/qpaintdevice.h \
 		/opt/qt5.7.0_arm/include/QtCore/qrect.h \
 		/opt/qt5.7.0_arm/include/QtCore/qsize.h \
-		/opt/qt5.7.0_arm/include/QtCore/qpoint.h \
 		/opt/qt5.7.0_arm/include/QtGui/qpalette.h \
 		/opt/qt5.7.0_arm/include/QtGui/qcolor.h \
 		/opt/qt5.7.0_arm/include/QtGui/qrgb.h \
 		/opt/qt5.7.0_arm/include/QtGui/qrgba64.h \
 		/opt/qt5.7.0_arm/include/QtGui/qbrush.h \
-		/opt/qt5.7.0_arm/include/QtCore/qvector.h \
 		/opt/qt5.7.0_arm/include/QtGui/qmatrix.h \
 		/opt/qt5.7.0_arm/include/QtGui/qpolygon.h \
 		/opt/qt5.7.0_arm/include/QtGui/qregion.h \
 		/opt/qt5.7.0_arm/include/QtCore/qdatastream.h \
-		/opt/qt5.7.0_arm/include/QtCore/qiodevice.h \
 		/opt/qt5.7.0_arm/include/QtCore/qline.h \
 		/opt/qt5.7.0_arm/include/QtGui/qtransform.h \
 		/opt/qt5.7.0_arm/include/QtGui/qpainterpath.h \
 		/opt/qt5.7.0_arm/include/QtGui/qimage.h \
 		/opt/qt5.7.0_arm/include/QtGui/qpixelformat.h \
 		/opt/qt5.7.0_arm/include/QtGui/qpixmap.h \
-		/opt/qt5.7.0_arm/include/QtCore/qsharedpointer.h \
-		/opt/qt5.7.0_arm/include/QtCore/qshareddata.h \
-		/opt/qt5.7.0_arm/include/QtCore/qhash.h \
-		/opt/qt5.7.0_arm/include/QtCore/qsharedpointer_impl.h \
 		/opt/qt5.7.0_arm/include/QtGui/qfont.h \
 		/opt/qt5.7.0_arm/include/QtGui/qfontmetrics.h \
 		/opt/qt5.7.0_arm/include/QtGui/qfontinfo.h \
 		/opt/qt5.7.0_arm/include/QtWidgets/qsizepolicy.h \
 		/opt/qt5.7.0_arm/include/QtGui/qcursor.h \
-		/opt/qt5.7.0_arm/include/QtGui/qkeysequence.h \
 		/opt/qt5.7.0_arm/include/QtGui/qevent.h \
-		/opt/qt5.7.0_arm/include/QtCore/qvariant.h \
-		/opt/qt5.7.0_arm/include/QtCore/qmap.h \
-		/opt/qt5.7.0_arm/include/QtCore/qdebug.h \
-		/opt/qt5.7.0_arm/include/QtCore/qtextstream.h \
-		/opt/qt5.7.0_arm/include/QtCore/qlocale.h \
-		/opt/qt5.7.0_arm/include/QtCore/qset.h \
-		/opt/qt5.7.0_arm/include/QtCore/qcontiguouscache.h \
 		/opt/qt5.7.0_arm/include/QtCore/qurl.h \
 		/opt/qt5.7.0_arm/include/QtCore/qurlquery.h \
 		/opt/qt5.7.0_arm/include/QtCore/qfile.h \
 		/opt/qt5.7.0_arm/include/QtCore/qfiledevice.h \
 		/opt/qt5.7.0_arm/include/QtGui/qvector2d.h \
 		/opt/qt5.7.0_arm/include/QtGui/qtouchdevice.h \
-		/opt/qt5.7.0_arm/include/QtWidgets/qtabwidget.h \
 		/opt/qt5.7.0_arm/include/QtGui/qicon.h \
-		/opt/qt5.7.0_arm/include/QtGui/QPaintEvent \
-		/opt/qt5.7.0_arm/include/QtCore/QTimer \
-		/opt/qt5.7.0_arm/include/QtCore/qtimer.h \
-		/opt/qt5.7.0_arm/include/QtCore/qbasictimer.h \
-		/opt/qt5.7.0_arm/include/QtGui/QPainter \
-		/opt/qt5.7.0_arm/include/QtGui/qpainter.h \
-		/opt/qt5.7.0_arm/include/QtGui/qtextoption.h \
-		/opt/qt5.7.0_arm/include/QtGui/qpen.h \
-		/opt/qt5.7.0_arm/include/QtGui/QPixmap \
-		/opt/qt5.7.0_arm/include/QtWidgets/QLabel \
-		/opt/qt5.7.0_arm/include/QtWidgets/qlabel.h \
-		/opt/qt5.7.0_arm/include/QtWidgets/qframe.h \
-		/opt/qt5.7.0_arm/include/QtGui/QImage \
-		/opt/qt5.7.0_arm/include/QtCore/QDebug \
-		/usr/local/include/opencv2/opencv.hpp \
-		/usr/local/include/opencv2/opencv_modules.hpp \
-		/usr/local/include/opencv2/core.hpp \
-		/usr/local/include/opencv2/core/cvdef.h \
-		/usr/local/include/opencv2/core/hal/interface.h \
-		/usr/local/include/opencv2/core/version.hpp \
-		/usr/local/include/opencv2/core/base.hpp \
-		/usr/local/include/opencv2/core/cvstd.hpp \
-		/usr/local/include/opencv2/core/ptr.inl.hpp \
-		/usr/local/include/opencv2/core/neon_utils.hpp \
-		/usr/local/include/opencv2/core/traits.hpp \
-		/usr/local/include/opencv2/core/matx.hpp \
-		/usr/local/include/opencv2/core/saturate.hpp \
-		/usr/local/include/opencv2/core/fast_math.hpp \
-		/usr/local/include/opencv2/core/types.hpp \
-		/usr/local/include/opencv2/core/mat.hpp \
-		/usr/local/include/opencv2/core/bufferpool.hpp \
-		/usr/local/include/opencv2/core/mat.inl.hpp \
-		/usr/local/include/opencv2/core/persistence.hpp \
-		/usr/local/include/opencv2/core/operations.hpp \
-		/usr/local/include/opencv2/core/cvstd.inl.hpp \
-		/usr/local/include/opencv2/core/utility.hpp \
-		/usr/local/include/opencv2/core/core_c.h \
-		/usr/local/include/opencv2/core/types_c.h \
-		/usr/local/include/opencv2/core/optim.hpp \
-		/usr/local/include/opencv2/core/ovx.hpp \
-		/usr/local/include/opencv2/calib3d.hpp \
-		/usr/local/include/opencv2/features2d.hpp \
-		/usr/local/include/opencv2/flann/miniflann.hpp \
-		/usr/local/include/opencv2/flann/defines.h \
-		/usr/local/include/opencv2/flann/config.h \
-		/usr/local/include/opencv2/core/affine.hpp \
-		/usr/local/include/opencv2/calib3d/calib3d_c.h \
-		/usr/local/include/opencv2/flann.hpp \
-		/usr/local/include/opencv2/flann/flann_base.hpp \
-		/usr/local/include/opencv2/flann/general.h \
-		/usr/local/include/opencv2/flann/matrix.h \
-		/usr/local/include/opencv2/flann/params.h \
-		/usr/local/include/opencv2/flann/any.h \
-		/usr/local/include/opencv2/flann/saving.h \
-		/usr/local/include/opencv2/flann/nn_index.h \
-		/usr/local/include/opencv2/flann/result_set.h \
-		/usr/local/include/opencv2/flann/all_indices.h \
-		/usr/local/include/opencv2/flann/kdtree_index.h \
-		/usr/local/include/opencv2/flann/dynamic_bitset.h \
-		/usr/local/include/opencv2/flann/dist.h \
-		/usr/local/include/opencv2/flann/heap.h \
-		/usr/local/include/opencv2/flann/allocator.h \
-		/usr/local/include/opencv2/flann/random.h \
-		/usr/local/include/opencv2/flann/kdtree_single_index.h \
-		/usr/local/include/opencv2/flann/kmeans_index.h \
-		/usr/local/include/opencv2/flann/logger.h \
-		/usr/local/include/opencv2/flann/composite_index.h \
-		/usr/local/include/opencv2/flann/linear_index.h \
-		/usr/local/include/opencv2/flann/hierarchical_clustering_index.h \
-		/usr/local/include/opencv2/flann/lsh_index.h \
-		/usr/local/include/opencv2/flann/lsh_table.h \
-		/usr/local/include/opencv2/flann/autotuned_index.h \
-		/usr/local/include/opencv2/flann/ground_truth.h \
-		/usr/local/include/opencv2/flann/index_testing.h \
-		/usr/local/include/opencv2/flann/timer.h \
-		/usr/local/include/opencv2/flann/sampling.h \
-		/usr/local/include/opencv2/highgui.hpp \
-		/usr/local/include/opencv2/imgcodecs.hpp \
-		/usr/local/include/opencv2/videoio.hpp \
-		/usr/local/include/opencv2/highgui/highgui_c.h \
-		/usr/local/include/opencv2/imgproc/imgproc_c.h \
-		/usr/local/include/opencv2/imgproc/types_c.h \
-		/usr/local/include/opencv2/imgcodecs/imgcodecs_c.h \
-		/usr/local/include/opencv2/videoio/videoio_c.h \
-		/usr/local/include/opencv2/imgproc.hpp \
-		/usr/local/include/opencv2/ml.hpp \
-		/usr/local/include/opencv2/objdetect.hpp \
-		/usr/local/include/opencv2/objdetect/detection_based_tracker.hpp \
-		/usr/local/include/opencv2/objdetect/objdetect_c.h \
-		/usr/local/include/opencv2/photo.hpp \
-		/usr/local/include/opencv2/photo/photo_c.h \
-		/usr/local/include/opencv2/shape.hpp \
-		/usr/local/include/opencv2/shape/emdL1.hpp \
-		/usr/local/include/opencv2/shape/shape_transformer.hpp \
-		/usr/local/include/opencv2/shape/hist_cost.hpp \
-		/usr/local/include/opencv2/shape/shape_distance.hpp \
-		/usr/local/include/opencv2/stitching.hpp \
-		/usr/local/include/opencv2/stitching/warpers.hpp \
-		/usr/local/include/opencv2/stitching/detail/warpers.hpp \
-		/usr/local/include/opencv2/core/cuda.hpp \
-		/usr/local/include/opencv2/core/cuda_types.hpp \
-		/usr/local/include/opencv2/core/cuda.inl.hpp \
-		/usr/local/include/opencv2/stitching/detail/warpers_inl.hpp \
-		/usr/local/include/opencv2/stitching/detail/matchers.hpp \
-		/usr/local/include/opencv2/stitching/detail/motion_estimators.hpp \
-		/usr/local/include/opencv2/stitching/detail/util.hpp \
-		/usr/local/include/opencv2/stitching/detail/util_inl.hpp \
-		/usr/local/include/opencv2/stitching/detail/camera.hpp \
-		/usr/local/include/opencv2/stitching/detail/exposure_compensate.hpp \
-		/usr/local/include/opencv2/stitching/detail/seam_finders.hpp \
-		/usr/local/include/opencv2/stitching/detail/blenders.hpp \
-		/usr/local/include/opencv2/superres.hpp \
-		/usr/local/include/opencv2/superres/optical_flow.hpp \
-		/usr/local/include/opencv2/video.hpp \
-		/usr/local/include/opencv2/video/tracking.hpp \
-		/usr/local/include/opencv2/video/background_segm.hpp \
-		/usr/local/include/opencv2/video/tracking_c.h \
-		/usr/local/include/opencv2/videostab.hpp \
-		/usr/local/include/opencv2/videostab/stabilizer.hpp \
-		/usr/local/include/opencv2/videostab/global_motion.hpp \
-		/usr/local/include/opencv2/videostab/optical_flow.hpp \
-		/usr/local/include/opencv2/videostab/motion_core.hpp \
-		/usr/local/include/opencv2/videostab/outlier_rejection.hpp \
-		/usr/local/include/opencv2/videostab/motion_stabilizing.hpp \
-		/usr/local/include/opencv2/videostab/frame_source.hpp \
-		/usr/local/include/opencv2/videostab/log.hpp \
-		/usr/local/include/opencv2/videostab/inpainting.hpp \
-		/usr/local/include/opencv2/videostab/fast_marching.hpp \
-		/usr/local/include/opencv2/videostab/fast_marching_inl.hpp \
-		/usr/local/include/opencv2/videostab/deblurring.hpp \
-		/usr/local/include/opencv2/videostab/wobble_suppression.hpp \
-		/usr/local/include/opencv2/videostab/ring_buffer.hpp \
-		ui_mainwindow.h \
-		/opt/qt5.7.0_arm/include/QtCore/QVariant \
-		/opt/qt5.7.0_arm/include/QtWidgets/QAction \
-		/opt/qt5.7.0_arm/include/QtWidgets/qaction.h \
 		/opt/qt5.7.0_arm/include/QtWidgets/qactiongroup.h \
 		/opt/qt5.7.0_arm/include/QtWidgets/QApplication \
 		/opt/qt5.7.0_arm/include/QtWidgets/qapplication.h \
@@ -1219,6 +839,7 @@ mainwindow.o: mainwindow.cpp mainwindow.h \
 		/opt/qt5.7.0_arm/include/QtWidgets/qheaderview.h \
 		/opt/qt5.7.0_arm/include/QtWidgets/qabstractitemview.h \
 		/opt/qt5.7.0_arm/include/QtWidgets/qabstractscrollarea.h \
+		/opt/qt5.7.0_arm/include/QtWidgets/qframe.h \
 		/opt/qt5.7.0_arm/include/QtCore/qabstractitemmodel.h \
 		/opt/qt5.7.0_arm/include/QtCore/qitemselectionmodel.h \
 		/opt/qt5.7.0_arm/include/QtWidgets/qabstractitemdelegate.h \
@@ -1230,57 +851,20 @@ mainwindow.o: mainwindow.cpp mainwindow.h \
 		/opt/qt5.7.0_arm/include/QtWidgets/qabstractslider.h \
 		/opt/qt5.7.0_arm/include/QtWidgets/qstyle.h \
 		/opt/qt5.7.0_arm/include/QtWidgets/qtabbar.h \
+		/opt/qt5.7.0_arm/include/QtWidgets/qtabwidget.h \
 		/opt/qt5.7.0_arm/include/QtWidgets/qrubberband.h \
+		/opt/qt5.7.0_arm/include/QtWidgets/QLabel \
+		/opt/qt5.7.0_arm/include/QtWidgets/qlabel.h \
+		/opt/qt5.7.0_arm/include/QtWidgets/QMainWindow \
+		/opt/qt5.7.0_arm/include/QtWidgets/qmainwindow.h \
 		/opt/qt5.7.0_arm/include/QtWidgets/QPushButton \
 		/opt/qt5.7.0_arm/include/QtWidgets/qpushbutton.h \
 		/opt/qt5.7.0_arm/include/QtWidgets/qabstractbutton.h \
-		/opt/qt5.7.0_arm/include/QtWidgets/QWidget \
-		video.h \
-		/usr/local/jpeglib/include/jpeglib.h \
-		/usr/local/jpeglib/include/jconfig.h \
-		/usr/local/jpeglib/include/jmorecfg.h \
-		/usr/local/jpeglib/include/jerror.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o mainwindow.o mainwindow.cpp
+		/opt/qt5.7.0_arm/include/QtWidgets/QWidget
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o mainwindow.o src/mainwindow.cpp
 
-video.o: video.cpp video.h \
-		/usr/local/jpeglib/include/jpeglib.h \
-		/usr/local/jpeglib/include/jconfig.h \
-		/usr/local/jpeglib/include/jmorecfg.h \
-		/usr/local/jpeglib/include/jerror.h \
-		/usr/local/include/opencv2/highgui.hpp \
-		/usr/local/include/opencv2/core.hpp \
-		/usr/local/include/opencv2/core/cvdef.h \
-		/usr/local/include/opencv2/core/hal/interface.h \
-		/usr/local/include/opencv2/core/version.hpp \
-		/usr/local/include/opencv2/core/base.hpp \
-		/usr/local/include/opencv2/opencv_modules.hpp \
-		/usr/local/include/opencv2/core/cvstd.hpp \
-		/usr/local/include/opencv2/core/ptr.inl.hpp \
-		/usr/local/include/opencv2/core/neon_utils.hpp \
-		/usr/local/include/opencv2/core/traits.hpp \
-		/usr/local/include/opencv2/core/matx.hpp \
-		/usr/local/include/opencv2/core/saturate.hpp \
-		/usr/local/include/opencv2/core/fast_math.hpp \
-		/usr/local/include/opencv2/core/types.hpp \
-		/usr/local/include/opencv2/core/mat.hpp \
-		/usr/local/include/opencv2/core/bufferpool.hpp \
-		/usr/local/include/opencv2/core/mat.inl.hpp \
-		/usr/local/include/opencv2/core/persistence.hpp \
-		/usr/local/include/opencv2/core/operations.hpp \
-		/usr/local/include/opencv2/core/cvstd.inl.hpp \
-		/usr/local/include/opencv2/core/utility.hpp \
-		/usr/local/include/opencv2/core/core_c.h \
-		/usr/local/include/opencv2/core/types_c.h \
-		/usr/local/include/opencv2/core/optim.hpp \
-		/usr/local/include/opencv2/core/ovx.hpp \
-		/usr/local/include/opencv2/imgcodecs.hpp \
-		/usr/local/include/opencv2/videoio.hpp \
-		/usr/local/include/opencv2/highgui/highgui_c.h \
-		/usr/local/include/opencv2/imgproc/imgproc_c.h \
-		/usr/local/include/opencv2/imgproc/types_c.h \
-		/usr/local/include/opencv2/imgcodecs/imgcodecs_c.h \
-		/usr/local/include/opencv2/videoio/videoio_c.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o video.o video.cpp
+video.o: src/video.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o video.o src/video.cpp
 
 moc_mainwindow.o: moc_mainwindow.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_mainwindow.o moc_mainwindow.cpp
