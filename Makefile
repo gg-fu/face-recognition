@@ -15,7 +15,7 @@ CXX           = arm-none-linux-gnueabi-g++ -Its
 DEFINES       = -DQT_DEPRECATED_WARNINGS -DQT_NO_DEBUG -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB
 CFLAGS        = -pipe -O2 -Wall -W -D_REENTRANT -fPIC $(DEFINES)
 CXXFLAGS      = -pipe -O2 -std=gnu++11 -Wall -W -D_REENTRANT -fPIC $(DEFINES)
-INCPATH       = -I. -I/usr/local/opencv-arm/include/opencv -I/usr/local/opencv-arm/include/opencv2 -I/usr/local/opencv-arm/include -I/usr/local/jpeglib/include -I/opt/qt5.7.0_arm/include -I/opt/qt5.7.0_arm/include/QtWidgets -I/opt/qt5.7.0_arm/include/QtGui -I/opt/qt5.7.0_arm/include/QtCore -I. -I. -I/opt/tslib1.4/include -I/opt/qt5.7.0_arm/mkspecs/linux-arm-gnueabi-g++
+INCPATH       = -I. -I/usr/local/opencv-arm/include/opencv -I/usr/local/opencv-arm/include/opencv2 -I/usr/local/opencv-arm/include -I/usr/local/jpeglib/include -I../jrtplib-3.11.1/src -I/opt/qt5.7.0_arm/include -I/opt/qt5.7.0_arm/include/QtWidgets -I/opt/qt5.7.0_arm/include/QtGui -I/opt/qt5.7.0_arm/include/QtCore -I. -I. -I/opt/tslib1.4/include -I/opt/qt5.7.0_arm/mkspecs/linux-arm-gnueabi-g++
 QMAKE         = /opt/qt5.7.0_arm/bin/qmake
 DEL_FILE      = rm -f
 CHK_DIR_EXISTS= test -d
@@ -36,7 +36,7 @@ DISTNAME      = Camera1.0.0
 DISTDIR = /home/bruvin_lu/Camera_new/.tmp/Camera1.0.0
 LINK          = arm-none-linux-gnueabi-g++ -Its
 LFLAGS        = -Wl,-O1 -Wl,-rpath,/opt/qt5.7.0_arm/lib
-LIBS          = $(SUBLIBS) -L/opt/tslib1.4/lib /usr/local/opencv-arm/lib/libopencv_core.so /usr/local/opencv-arm/lib/libopencv_highgui.so /usr/local/opencv-arm/lib/libopencv_calib3d.so /usr/local/opencv-arm/lib/libopencv_features2d.so /usr/local/opencv-arm/lib/libopencv_flann.so /usr/local/opencv-arm/lib/libopencv_imgcodecs.so /usr/local/opencv-arm/lib/libopencv_imgproc.so /usr/local/opencv-arm/lib/libopencv_ml.so /usr/local/opencv-arm/lib/libopencv_objdetect.so /usr/local/opencv-arm/lib/libopencv_photo.so /usr/local/opencv-arm/lib/libopencv_video.so /usr/local/opencv-arm/lib/libopencv_shape.so /usr/local/opencv-arm/lib/libopencv_videoio.so /usr/local/opencv-arm/lib/libopencv_stitching.so /usr/local/opencv-arm/lib/libopencv_superres.so /usr/local/jpeglib/lib/libjpeg.so /home/bruvin_lu/Camera_new/lib/libncnn.a -L/opt/qt5.7.0_arm/lib -lQt5Widgets -L/opt/tslib/lib -lQt5Gui -lQt5Core -lpthread 
+LIBS          = $(SUBLIBS) -L/opt/tslib1.4/lib -L /usr/local/opencv-arm/lib/ -lopencv_core -lopencv_highgui -lopencv_calib3d -lopencv_features2d -lopencv_flann -lopencv_imgcodecs -lopencv_imgproc -lopencv_ml -lopencv_objdetect -lopencv_photo -lopencv_video -lopencv_shape -lopencv_videoio -lopencv_stitching -lopencv_superres -L/usr/local/jpeglib/lib/ -ljpeg -L/home/bruvin_lu/Camera_new/lib/ -lncnn -L/usr/local/JRTPLib -ljthread -ljrtp -L/opt/qt5.7.0_arm/lib -lQt5Widgets -L/opt/tslib/lib -lQt5Gui -lQt5Core -lpthread 
 AR            = arm-none-linux-gnueabi-ar cqs
 RANLIB        = 
 SED           = sed
@@ -50,10 +50,20 @@ OBJECTS_DIR   = ./
 
 SOURCES       = src/main.cpp \
 		src/mainwindow.cpp \
-		src/video.cpp moc_mainwindow.cpp
+		src/video.cpp \
+		src/HAL_TCP_linux.c \
+		src/queue.cpp \
+		src/pic_thread.cpp \
+		src/rtp_client.cpp \
+		src/mat_to_jpeg.cpp moc_mainwindow.cpp
 OBJECTS       = main.o \
 		mainwindow.o \
 		video.o \
+		HAL_TCP_linux.o \
+		queue.o \
+		pic_thread.o \
+		rtp_client.o \
+		mat_to_jpeg.o \
 		moc_mainwindow.o
 DIST          = /opt/qt5.7.0_arm/mkspecs/features/spec_pre.prf \
 		/opt/qt5.7.0_arm/mkspecs/common/unix.conf \
@@ -148,9 +158,19 @@ DIST          = /opt/qt5.7.0_arm/mkspecs/features/spec_pre.prf \
 		/opt/qt5.7.0_arm/mkspecs/features/yacc.prf \
 		/opt/qt5.7.0_arm/mkspecs/features/lex.prf \
 		Camera.pro include/mainwindow.h \
-		include/video.h src/main.cpp \
+		include/video.h \
+		include/HAL_TCP_linux.h \
+		include/pic_thread.h \
+		include/queue.h \
+		include/rtp_client.h \
+		include/mat_to_jpeg.h src/main.cpp \
 		src/mainwindow.cpp \
-		src/video.cpp
+		src/video.cpp \
+		src/HAL_TCP_linux.c \
+		src/queue.cpp \
+		src/pic_thread.cpp \
+		src/rtp_client.cpp \
+		src/mat_to_jpeg.cpp
 QMAKE_TARGET  = Camera
 DESTDIR       = 
 TARGET        = Camera
@@ -369,8 +389,8 @@ dist: distdir FORCE
 distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
-	$(COPY_FILE) --parents include/mainwindow.h include/video.h $(DISTDIR)/
-	$(COPY_FILE) --parents src/main.cpp src/mainwindow.cpp src/video.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents include/mainwindow.h include/video.h include/HAL_TCP_linux.h include/pic_thread.h include/queue.h include/rtp_client.h include/mat_to_jpeg.h $(DISTDIR)/
+	$(COPY_FILE) --parents src/main.cpp src/mainwindow.cpp src/video.cpp src/HAL_TCP_linux.c src/queue.cpp src/pic_thread.cpp src/rtp_client.cpp src/mat_to_jpeg.cpp $(DISTDIR)/
 	$(COPY_FILE) --parents mainwindow.ui $(DISTDIR)/
 
 
@@ -514,7 +534,7 @@ moc_mainwindow.cpp: /opt/qt5.7.0_arm/include/QtWidgets/QMainWindow \
 		/opt/qt5.7.0_arm/include/QtWidgets/qframe.h \
 		/opt/qt5.7.0_arm/include/QtGui/QImage \
 		/opt/qt5.7.0_arm/include/QtCore/QDebug \
-		ui_mainwindow.h \
+		include/ui_mainwindow.h \
 		/opt/qt5.7.0_arm/include/QtCore/QVariant \
 		/opt/qt5.7.0_arm/include/QtWidgets/QAction \
 		/opt/qt5.7.0_arm/include/QtWidgets/qaction.h \
@@ -590,6 +610,9 @@ moc_mainwindow.cpp: /opt/qt5.7.0_arm/include/QtWidgets/QMainWindow \
 		/usr/local/opencv-arm/include/opencv2/highgui/highgui.hpp \
 		/usr/local/opencv-arm/include/opencv2/imgproc/imgproc.hpp \
 		/usr/local/opencv-arm/include/opencv2/imgproc.hpp \
+		include/pic_thread.h \
+		/opt/qt5.7.0_arm/include/QtCore/QThread \
+		/opt/qt5.7.0_arm/include/QtCore/qthread.h \
 		include/net.h \
 		include/blob.h \
 		include/platform.h \
@@ -598,7 +621,7 @@ moc_mainwindow.cpp: /opt/qt5.7.0_arm/include/QtWidgets/QMainWindow \
 		include/paramdict.h \
 		include/mainwindow.h \
 		/opt/qt5.7.0_arm/bin/moc
-	/opt/qt5.7.0_arm/bin/moc $(DEFINES) -I/opt/qt5.7.0_arm/mkspecs/linux-arm-gnueabi-g++ -I/home/bruvin_lu/Camera_new -I/usr/local/opencv-arm/include/opencv -I/usr/local/opencv-arm/include/opencv2 -I/usr/local/opencv-arm/include -I/usr/local/jpeglib/include -I/opt/qt5.7.0_arm/include -I/opt/qt5.7.0_arm/include/QtWidgets -I/opt/qt5.7.0_arm/include/QtGui -I/opt/qt5.7.0_arm/include/QtCore -I/opt/arm-2014.05/arm-none-linux-gnueabi/include/c++/4.8.3 -I/opt/arm-2014.05/arm-none-linux-gnueabi/include/c++/4.8.3/arm-none-linux-gnueabi -I/opt/arm-2014.05/arm-none-linux-gnueabi/include/c++/4.8.3/backward -I/opt/arm-2014.05/lib/gcc/arm-none-linux-gnueabi/4.8.3/include -I/opt/arm-2014.05/lib/gcc/arm-none-linux-gnueabi/4.8.3/include-fixed -I/opt/arm-2014.05/arm-none-linux-gnueabi/include -I/opt/arm-2014.05/arm-none-linux-gnueabi/libc/usr/include include/mainwindow.h -o moc_mainwindow.cpp
+	/opt/qt5.7.0_arm/bin/moc $(DEFINES) -I/opt/qt5.7.0_arm/mkspecs/linux-arm-gnueabi-g++ -I/home/bruvin_lu/Camera_new -I/usr/local/opencv-arm/include/opencv -I/usr/local/opencv-arm/include/opencv2 -I/usr/local/opencv-arm/include -I/usr/local/jpeglib/include -I/home/bruvin_lu/jrtplib-3.11.1/src -I/opt/qt5.7.0_arm/include -I/opt/qt5.7.0_arm/include/QtWidgets -I/opt/qt5.7.0_arm/include/QtGui -I/opt/qt5.7.0_arm/include/QtCore -I/opt/arm-2014.05/arm-none-linux-gnueabi/include/c++/4.8.3 -I/opt/arm-2014.05/arm-none-linux-gnueabi/include/c++/4.8.3/arm-none-linux-gnueabi -I/opt/arm-2014.05/arm-none-linux-gnueabi/include/c++/4.8.3/backward -I/opt/arm-2014.05/lib/gcc/arm-none-linux-gnueabi/4.8.3/include -I/opt/arm-2014.05/lib/gcc/arm-none-linux-gnueabi/4.8.3/include-fixed -I/opt/arm-2014.05/arm-none-linux-gnueabi/include -I/opt/arm-2014.05/arm-none-linux-gnueabi/libc/usr/include include/mainwindow.h -o moc_mainwindow.cpp
 
 compiler_moc_source_make_all:
 compiler_moc_source_clean:
@@ -619,9 +642,11 @@ compiler_clean: compiler_moc_header_clean compiler_uic_clean
 
 ####### Compile
 
-main.o: src/main.cpp /opt/qt5.7.0_arm/include/QtWidgets/QApplication \
-		/opt/qt5.7.0_arm/include/QtWidgets/qapplication.h \
-		/opt/qt5.7.0_arm/include/QtCore/qcoreapplication.h \
+main.o: src/main.cpp include/mainwindow.h \
+		/opt/qt5.7.0_arm/include/QtWidgets/QMainWindow \
+		/opt/qt5.7.0_arm/include/QtWidgets/qmainwindow.h \
+		/opt/qt5.7.0_arm/include/QtWidgets/qwidget.h \
+		/opt/qt5.7.0_arm/include/QtGui/qwindowdefs.h \
 		/opt/qt5.7.0_arm/include/QtCore/qglobal.h \
 		/opt/qt5.7.0_arm/include/QtCore/qconfig.h \
 		/opt/qt5.7.0_arm/include/QtCore/qfeatures.h \
@@ -644,16 +669,17 @@ main.o: src/main.cpp /opt/qt5.7.0_arm/include/QtWidgets/QApplication \
 		/opt/qt5.7.0_arm/include/QtCore/qmutex.h \
 		/opt/qt5.7.0_arm/include/QtCore/qnumeric.h \
 		/opt/qt5.7.0_arm/include/QtCore/qversiontagging.h \
+		/opt/qt5.7.0_arm/include/QtCore/qobjectdefs.h \
+		/opt/qt5.7.0_arm/include/QtCore/qnamespace.h \
+		/opt/qt5.7.0_arm/include/QtCore/qobjectdefs_impl.h \
+		/opt/qt5.7.0_arm/include/QtGui/qwindowdefs_win.h \
+		/opt/qt5.7.0_arm/include/QtCore/qobject.h \
 		/opt/qt5.7.0_arm/include/QtCore/qstring.h \
 		/opt/qt5.7.0_arm/include/QtCore/qchar.h \
 		/opt/qt5.7.0_arm/include/QtCore/qbytearray.h \
 		/opt/qt5.7.0_arm/include/QtCore/qrefcount.h \
-		/opt/qt5.7.0_arm/include/QtCore/qnamespace.h \
 		/opt/qt5.7.0_arm/include/QtCore/qarraydata.h \
 		/opt/qt5.7.0_arm/include/QtCore/qstringbuilder.h \
-		/opt/qt5.7.0_arm/include/QtCore/qobject.h \
-		/opt/qt5.7.0_arm/include/QtCore/qobjectdefs.h \
-		/opt/qt5.7.0_arm/include/QtCore/qobjectdefs_impl.h \
 		/opt/qt5.7.0_arm/include/QtCore/qlist.h \
 		/opt/qt5.7.0_arm/include/QtCore/qalgorithms.h \
 		/opt/qt5.7.0_arm/include/QtCore/qiterator.h \
@@ -669,17 +695,11 @@ main.o: src/main.cpp /opt/qt5.7.0_arm/include/QtWidgets/QApplication \
 		/opt/qt5.7.0_arm/include/QtCore/qvarlengtharray.h \
 		/opt/qt5.7.0_arm/include/QtCore/qcontainerfwd.h \
 		/opt/qt5.7.0_arm/include/QtCore/qobject_impl.h \
-		/opt/qt5.7.0_arm/include/QtCore/qeventloop.h \
-		/opt/qt5.7.0_arm/include/QtGui/qwindowdefs.h \
-		/opt/qt5.7.0_arm/include/QtGui/qwindowdefs_win.h \
-		/opt/qt5.7.0_arm/include/QtCore/qpoint.h \
-		/opt/qt5.7.0_arm/include/QtCore/qsize.h \
-		/opt/qt5.7.0_arm/include/QtGui/qcursor.h \
-		/opt/qt5.7.0_arm/include/QtWidgets/qdesktopwidget.h \
-		/opt/qt5.7.0_arm/include/QtWidgets/qwidget.h \
 		/opt/qt5.7.0_arm/include/QtCore/qmargins.h \
 		/opt/qt5.7.0_arm/include/QtGui/qpaintdevice.h \
 		/opt/qt5.7.0_arm/include/QtCore/qrect.h \
+		/opt/qt5.7.0_arm/include/QtCore/qsize.h \
+		/opt/qt5.7.0_arm/include/QtCore/qpoint.h \
 		/opt/qt5.7.0_arm/include/QtGui/qpalette.h \
 		/opt/qt5.7.0_arm/include/QtGui/qcolor.h \
 		/opt/qt5.7.0_arm/include/QtGui/qrgb.h \
@@ -705,6 +725,7 @@ main.o: src/main.cpp /opt/qt5.7.0_arm/include/QtWidgets/QApplication \
 		/opt/qt5.7.0_arm/include/QtGui/qfontmetrics.h \
 		/opt/qt5.7.0_arm/include/QtGui/qfontinfo.h \
 		/opt/qt5.7.0_arm/include/QtWidgets/qsizepolicy.h \
+		/opt/qt5.7.0_arm/include/QtGui/qcursor.h \
 		/opt/qt5.7.0_arm/include/QtGui/qkeysequence.h \
 		/opt/qt5.7.0_arm/include/QtGui/qevent.h \
 		/opt/qt5.7.0_arm/include/QtCore/qvariant.h \
@@ -720,111 +741,26 @@ main.o: src/main.cpp /opt/qt5.7.0_arm/include/QtWidgets/QApplication \
 		/opt/qt5.7.0_arm/include/QtCore/qfiledevice.h \
 		/opt/qt5.7.0_arm/include/QtGui/qvector2d.h \
 		/opt/qt5.7.0_arm/include/QtGui/qtouchdevice.h \
-		/opt/qt5.7.0_arm/include/QtGui/qguiapplication.h \
-		/opt/qt5.7.0_arm/include/QtGui/qinputmethod.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o src/main.cpp
-
-mainwindow.o: src/mainwindow.cpp ui_mainwindow.h \
+		/opt/qt5.7.0_arm/include/QtWidgets/qtabwidget.h \
+		/opt/qt5.7.0_arm/include/QtGui/qicon.h \
+		/opt/qt5.7.0_arm/include/QtGui/QPaintEvent \
+		/opt/qt5.7.0_arm/include/QtCore/QTimer \
+		/opt/qt5.7.0_arm/include/QtCore/qtimer.h \
+		/opt/qt5.7.0_arm/include/QtCore/qbasictimer.h \
+		/opt/qt5.7.0_arm/include/QtGui/QPainter \
+		/opt/qt5.7.0_arm/include/QtGui/qpainter.h \
+		/opt/qt5.7.0_arm/include/QtGui/qtextoption.h \
+		/opt/qt5.7.0_arm/include/QtGui/qpen.h \
+		/opt/qt5.7.0_arm/include/QtGui/QPixmap \
+		/opt/qt5.7.0_arm/include/QtWidgets/QLabel \
+		/opt/qt5.7.0_arm/include/QtWidgets/qlabel.h \
+		/opt/qt5.7.0_arm/include/QtWidgets/qframe.h \
+		/opt/qt5.7.0_arm/include/QtGui/QImage \
+		/opt/qt5.7.0_arm/include/QtCore/QDebug \
+		include/ui_mainwindow.h \
 		/opt/qt5.7.0_arm/include/QtCore/QVariant \
-		/opt/qt5.7.0_arm/include/QtCore/qvariant.h \
-		/opt/qt5.7.0_arm/include/QtCore/qatomic.h \
-		/opt/qt5.7.0_arm/include/QtCore/qglobal.h \
-		/opt/qt5.7.0_arm/include/QtCore/qconfig.h \
-		/opt/qt5.7.0_arm/include/QtCore/qfeatures.h \
-		/opt/qt5.7.0_arm/include/QtCore/qsystemdetection.h \
-		/opt/qt5.7.0_arm/include/QtCore/qprocessordetection.h \
-		/opt/qt5.7.0_arm/include/QtCore/qcompilerdetection.h \
-		/opt/qt5.7.0_arm/include/QtCore/qtypeinfo.h \
-		/opt/qt5.7.0_arm/include/QtCore/qtypetraits.h \
-		/opt/qt5.7.0_arm/include/QtCore/qisenum.h \
-		/opt/qt5.7.0_arm/include/QtCore/qsysinfo.h \
-		/opt/qt5.7.0_arm/include/QtCore/qlogging.h \
-		/opt/qt5.7.0_arm/include/QtCore/qflags.h \
-		/opt/qt5.7.0_arm/include/QtCore/qglobalstatic.h \
-		/opt/qt5.7.0_arm/include/QtCore/qmutex.h \
-		/opt/qt5.7.0_arm/include/QtCore/qnumeric.h \
-		/opt/qt5.7.0_arm/include/QtCore/qversiontagging.h \
-		/opt/qt5.7.0_arm/include/QtCore/qbasicatomic.h \
-		/opt/qt5.7.0_arm/include/QtCore/qatomic_bootstrap.h \
-		/opt/qt5.7.0_arm/include/QtCore/qgenericatomic.h \
-		/opt/qt5.7.0_arm/include/QtCore/qatomic_cxx11.h \
-		/opt/qt5.7.0_arm/include/QtCore/qatomic_msvc.h \
-		/opt/qt5.7.0_arm/include/QtCore/qbytearray.h \
-		/opt/qt5.7.0_arm/include/QtCore/qrefcount.h \
-		/opt/qt5.7.0_arm/include/QtCore/qnamespace.h \
-		/opt/qt5.7.0_arm/include/QtCore/qarraydata.h \
-		/opt/qt5.7.0_arm/include/QtCore/qstring.h \
-		/opt/qt5.7.0_arm/include/QtCore/qchar.h \
-		/opt/qt5.7.0_arm/include/QtCore/qstringbuilder.h \
-		/opt/qt5.7.0_arm/include/QtCore/qlist.h \
-		/opt/qt5.7.0_arm/include/QtCore/qalgorithms.h \
-		/opt/qt5.7.0_arm/include/QtCore/qiterator.h \
-		/opt/qt5.7.0_arm/include/QtCore/qhashfunctions.h \
-		/opt/qt5.7.0_arm/include/QtCore/qpair.h \
-		/opt/qt5.7.0_arm/include/QtCore/qbytearraylist.h \
-		/opt/qt5.7.0_arm/include/QtCore/qstringlist.h \
-		/opt/qt5.7.0_arm/include/QtCore/qregexp.h \
-		/opt/qt5.7.0_arm/include/QtCore/qstringmatcher.h \
-		/opt/qt5.7.0_arm/include/QtCore/qmetatype.h \
-		/opt/qt5.7.0_arm/include/QtCore/qvarlengtharray.h \
-		/opt/qt5.7.0_arm/include/QtCore/qcontainerfwd.h \
-		/opt/qt5.7.0_arm/include/QtCore/qobjectdefs.h \
-		/opt/qt5.7.0_arm/include/QtCore/qobjectdefs_impl.h \
-		/opt/qt5.7.0_arm/include/QtCore/qmap.h \
-		/opt/qt5.7.0_arm/include/QtCore/qdebug.h \
-		/opt/qt5.7.0_arm/include/QtCore/qhash.h \
-		/opt/qt5.7.0_arm/include/QtCore/qtextstream.h \
-		/opt/qt5.7.0_arm/include/QtCore/qiodevice.h \
-		/opt/qt5.7.0_arm/include/QtCore/qobject.h \
-		/opt/qt5.7.0_arm/include/QtCore/qcoreevent.h \
-		/opt/qt5.7.0_arm/include/QtCore/qscopedpointer.h \
-		/opt/qt5.7.0_arm/include/QtCore/qobject_impl.h \
-		/opt/qt5.7.0_arm/include/QtCore/qlocale.h \
-		/opt/qt5.7.0_arm/include/QtCore/qshareddata.h \
-		/opt/qt5.7.0_arm/include/QtCore/qvector.h \
-		/opt/qt5.7.0_arm/include/QtCore/qpoint.h \
-		/opt/qt5.7.0_arm/include/QtCore/qset.h \
-		/opt/qt5.7.0_arm/include/QtCore/qcontiguouscache.h \
-		/opt/qt5.7.0_arm/include/QtCore/qsharedpointer.h \
-		/opt/qt5.7.0_arm/include/QtCore/qsharedpointer_impl.h \
 		/opt/qt5.7.0_arm/include/QtWidgets/QAction \
 		/opt/qt5.7.0_arm/include/QtWidgets/qaction.h \
-		/opt/qt5.7.0_arm/include/QtGui/qkeysequence.h \
-		/opt/qt5.7.0_arm/include/QtWidgets/qwidget.h \
-		/opt/qt5.7.0_arm/include/QtGui/qwindowdefs.h \
-		/opt/qt5.7.0_arm/include/QtGui/qwindowdefs_win.h \
-		/opt/qt5.7.0_arm/include/QtCore/qmargins.h \
-		/opt/qt5.7.0_arm/include/QtGui/qpaintdevice.h \
-		/opt/qt5.7.0_arm/include/QtCore/qrect.h \
-		/opt/qt5.7.0_arm/include/QtCore/qsize.h \
-		/opt/qt5.7.0_arm/include/QtGui/qpalette.h \
-		/opt/qt5.7.0_arm/include/QtGui/qcolor.h \
-		/opt/qt5.7.0_arm/include/QtGui/qrgb.h \
-		/opt/qt5.7.0_arm/include/QtGui/qrgba64.h \
-		/opt/qt5.7.0_arm/include/QtGui/qbrush.h \
-		/opt/qt5.7.0_arm/include/QtGui/qmatrix.h \
-		/opt/qt5.7.0_arm/include/QtGui/qpolygon.h \
-		/opt/qt5.7.0_arm/include/QtGui/qregion.h \
-		/opt/qt5.7.0_arm/include/QtCore/qdatastream.h \
-		/opt/qt5.7.0_arm/include/QtCore/qline.h \
-		/opt/qt5.7.0_arm/include/QtGui/qtransform.h \
-		/opt/qt5.7.0_arm/include/QtGui/qpainterpath.h \
-		/opt/qt5.7.0_arm/include/QtGui/qimage.h \
-		/opt/qt5.7.0_arm/include/QtGui/qpixelformat.h \
-		/opt/qt5.7.0_arm/include/QtGui/qpixmap.h \
-		/opt/qt5.7.0_arm/include/QtGui/qfont.h \
-		/opt/qt5.7.0_arm/include/QtGui/qfontmetrics.h \
-		/opt/qt5.7.0_arm/include/QtGui/qfontinfo.h \
-		/opt/qt5.7.0_arm/include/QtWidgets/qsizepolicy.h \
-		/opt/qt5.7.0_arm/include/QtGui/qcursor.h \
-		/opt/qt5.7.0_arm/include/QtGui/qevent.h \
-		/opt/qt5.7.0_arm/include/QtCore/qurl.h \
-		/opt/qt5.7.0_arm/include/QtCore/qurlquery.h \
-		/opt/qt5.7.0_arm/include/QtCore/qfile.h \
-		/opt/qt5.7.0_arm/include/QtCore/qfiledevice.h \
-		/opt/qt5.7.0_arm/include/QtGui/qvector2d.h \
-		/opt/qt5.7.0_arm/include/QtGui/qtouchdevice.h \
-		/opt/qt5.7.0_arm/include/QtGui/qicon.h \
 		/opt/qt5.7.0_arm/include/QtWidgets/qactiongroup.h \
 		/opt/qt5.7.0_arm/include/QtWidgets/QApplication \
 		/opt/qt5.7.0_arm/include/QtWidgets/qapplication.h \
@@ -839,7 +775,6 @@ mainwindow.o: src/mainwindow.cpp ui_mainwindow.h \
 		/opt/qt5.7.0_arm/include/QtWidgets/qheaderview.h \
 		/opt/qt5.7.0_arm/include/QtWidgets/qabstractitemview.h \
 		/opt/qt5.7.0_arm/include/QtWidgets/qabstractscrollarea.h \
-		/opt/qt5.7.0_arm/include/QtWidgets/qframe.h \
 		/opt/qt5.7.0_arm/include/QtCore/qabstractitemmodel.h \
 		/opt/qt5.7.0_arm/include/QtCore/qitemselectionmodel.h \
 		/opt/qt5.7.0_arm/include/QtWidgets/qabstractitemdelegate.h \
@@ -851,20 +786,488 @@ mainwindow.o: src/mainwindow.cpp ui_mainwindow.h \
 		/opt/qt5.7.0_arm/include/QtWidgets/qabstractslider.h \
 		/opt/qt5.7.0_arm/include/QtWidgets/qstyle.h \
 		/opt/qt5.7.0_arm/include/QtWidgets/qtabbar.h \
-		/opt/qt5.7.0_arm/include/QtWidgets/qtabwidget.h \
 		/opt/qt5.7.0_arm/include/QtWidgets/qrubberband.h \
-		/opt/qt5.7.0_arm/include/QtWidgets/QLabel \
-		/opt/qt5.7.0_arm/include/QtWidgets/qlabel.h \
-		/opt/qt5.7.0_arm/include/QtWidgets/QMainWindow \
-		/opt/qt5.7.0_arm/include/QtWidgets/qmainwindow.h \
 		/opt/qt5.7.0_arm/include/QtWidgets/QPushButton \
 		/opt/qt5.7.0_arm/include/QtWidgets/qpushbutton.h \
 		/opt/qt5.7.0_arm/include/QtWidgets/qabstractbutton.h \
-		/opt/qt5.7.0_arm/include/QtWidgets/QWidget
+		/opt/qt5.7.0_arm/include/QtWidgets/QWidget \
+		include/video.h \
+		/usr/local/jpeglib/include/jpeglib.h \
+		/usr/local/jpeglib/include/jconfig.h \
+		/usr/local/jpeglib/include/jmorecfg.h \
+		/usr/local/jpeglib/include/jerror.h \
+		/usr/local/opencv-arm/include/opencv2/highgui.hpp \
+		/usr/local/opencv-arm/include/opencv2/core.hpp \
+		/usr/local/opencv-arm/include/opencv2/core/cvdef.h \
+		/usr/local/opencv-arm/include/opencv2/core/hal/interface.h \
+		/usr/local/opencv-arm/include/opencv2/core/version.hpp \
+		/usr/local/opencv-arm/include/opencv2/core/base.hpp \
+		/usr/local/opencv-arm/include/opencv2/opencv_modules.hpp \
+		/usr/local/opencv-arm/include/opencv2/core/cvstd.hpp \
+		/usr/local/opencv-arm/include/opencv2/core/ptr.inl.hpp \
+		/usr/local/opencv-arm/include/opencv2/core/neon_utils.hpp \
+		/usr/local/opencv-arm/include/opencv2/core/traits.hpp \
+		/usr/local/opencv-arm/include/opencv2/core/matx.hpp \
+		/usr/local/opencv-arm/include/opencv2/core/saturate.hpp \
+		/usr/local/opencv-arm/include/opencv2/core/fast_math.hpp \
+		/usr/local/opencv-arm/include/opencv2/core/types.hpp \
+		/usr/local/opencv-arm/include/opencv2/core/mat.hpp \
+		/usr/local/opencv-arm/include/opencv2/core/bufferpool.hpp \
+		/usr/local/opencv-arm/include/opencv2/core/mat.inl.hpp \
+		/usr/local/opencv-arm/include/opencv2/core/persistence.hpp \
+		/usr/local/opencv-arm/include/opencv2/core/operations.hpp \
+		/usr/local/opencv-arm/include/opencv2/core/cvstd.inl.hpp \
+		/usr/local/opencv-arm/include/opencv2/core/utility.hpp \
+		/usr/local/opencv-arm/include/opencv2/core/core_c.h \
+		/usr/local/opencv-arm/include/opencv2/core/types_c.h \
+		/usr/local/opencv-arm/include/opencv2/core/optim.hpp \
+		/usr/local/opencv-arm/include/opencv2/core/ovx.hpp \
+		/usr/local/opencv-arm/include/opencv2/imgcodecs.hpp \
+		/usr/local/opencv-arm/include/opencv2/videoio.hpp \
+		/usr/local/opencv-arm/include/opencv2/highgui/highgui_c.h \
+		/usr/local/opencv-arm/include/opencv2/imgproc/imgproc_c.h \
+		/usr/local/opencv-arm/include/opencv2/imgproc/types_c.h \
+		/usr/local/opencv-arm/include/opencv2/imgcodecs/imgcodecs_c.h \
+		/usr/local/opencv-arm/include/opencv2/videoio/videoio_c.h \
+		/usr/local/opencv-arm/include/opencv2/core/core.hpp \
+		/usr/local/opencv-arm/include/opencv2/highgui/highgui.hpp \
+		/usr/local/opencv-arm/include/opencv2/imgproc/imgproc.hpp \
+		/usr/local/opencv-arm/include/opencv2/imgproc.hpp \
+		include/pic_thread.h \
+		/opt/qt5.7.0_arm/include/QtCore/QThread \
+		/opt/qt5.7.0_arm/include/QtCore/qthread.h \
+		include/net.h \
+		include/blob.h \
+		include/platform.h \
+		include/layer.h \
+		include/mat.h \
+		include/paramdict.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o src/main.cpp
+
+mainwindow.o: src/mainwindow.cpp include/mainwindow.h \
+		/opt/qt5.7.0_arm/include/QtWidgets/QMainWindow \
+		/opt/qt5.7.0_arm/include/QtWidgets/qmainwindow.h \
+		/opt/qt5.7.0_arm/include/QtWidgets/qwidget.h \
+		/opt/qt5.7.0_arm/include/QtGui/qwindowdefs.h \
+		/opt/qt5.7.0_arm/include/QtCore/qglobal.h \
+		/opt/qt5.7.0_arm/include/QtCore/qconfig.h \
+		/opt/qt5.7.0_arm/include/QtCore/qfeatures.h \
+		/opt/qt5.7.0_arm/include/QtCore/qsystemdetection.h \
+		/opt/qt5.7.0_arm/include/QtCore/qprocessordetection.h \
+		/opt/qt5.7.0_arm/include/QtCore/qcompilerdetection.h \
+		/opt/qt5.7.0_arm/include/QtCore/qtypeinfo.h \
+		/opt/qt5.7.0_arm/include/QtCore/qtypetraits.h \
+		/opt/qt5.7.0_arm/include/QtCore/qisenum.h \
+		/opt/qt5.7.0_arm/include/QtCore/qsysinfo.h \
+		/opt/qt5.7.0_arm/include/QtCore/qlogging.h \
+		/opt/qt5.7.0_arm/include/QtCore/qflags.h \
+		/opt/qt5.7.0_arm/include/QtCore/qatomic.h \
+		/opt/qt5.7.0_arm/include/QtCore/qbasicatomic.h \
+		/opt/qt5.7.0_arm/include/QtCore/qatomic_bootstrap.h \
+		/opt/qt5.7.0_arm/include/QtCore/qgenericatomic.h \
+		/opt/qt5.7.0_arm/include/QtCore/qatomic_cxx11.h \
+		/opt/qt5.7.0_arm/include/QtCore/qatomic_msvc.h \
+		/opt/qt5.7.0_arm/include/QtCore/qglobalstatic.h \
+		/opt/qt5.7.0_arm/include/QtCore/qmutex.h \
+		/opt/qt5.7.0_arm/include/QtCore/qnumeric.h \
+		/opt/qt5.7.0_arm/include/QtCore/qversiontagging.h \
+		/opt/qt5.7.0_arm/include/QtCore/qobjectdefs.h \
+		/opt/qt5.7.0_arm/include/QtCore/qnamespace.h \
+		/opt/qt5.7.0_arm/include/QtCore/qobjectdefs_impl.h \
+		/opt/qt5.7.0_arm/include/QtGui/qwindowdefs_win.h \
+		/opt/qt5.7.0_arm/include/QtCore/qobject.h \
+		/opt/qt5.7.0_arm/include/QtCore/qstring.h \
+		/opt/qt5.7.0_arm/include/QtCore/qchar.h \
+		/opt/qt5.7.0_arm/include/QtCore/qbytearray.h \
+		/opt/qt5.7.0_arm/include/QtCore/qrefcount.h \
+		/opt/qt5.7.0_arm/include/QtCore/qarraydata.h \
+		/opt/qt5.7.0_arm/include/QtCore/qstringbuilder.h \
+		/opt/qt5.7.0_arm/include/QtCore/qlist.h \
+		/opt/qt5.7.0_arm/include/QtCore/qalgorithms.h \
+		/opt/qt5.7.0_arm/include/QtCore/qiterator.h \
+		/opt/qt5.7.0_arm/include/QtCore/qhashfunctions.h \
+		/opt/qt5.7.0_arm/include/QtCore/qpair.h \
+		/opt/qt5.7.0_arm/include/QtCore/qbytearraylist.h \
+		/opt/qt5.7.0_arm/include/QtCore/qstringlist.h \
+		/opt/qt5.7.0_arm/include/QtCore/qregexp.h \
+		/opt/qt5.7.0_arm/include/QtCore/qstringmatcher.h \
+		/opt/qt5.7.0_arm/include/QtCore/qcoreevent.h \
+		/opt/qt5.7.0_arm/include/QtCore/qscopedpointer.h \
+		/opt/qt5.7.0_arm/include/QtCore/qmetatype.h \
+		/opt/qt5.7.0_arm/include/QtCore/qvarlengtharray.h \
+		/opt/qt5.7.0_arm/include/QtCore/qcontainerfwd.h \
+		/opt/qt5.7.0_arm/include/QtCore/qobject_impl.h \
+		/opt/qt5.7.0_arm/include/QtCore/qmargins.h \
+		/opt/qt5.7.0_arm/include/QtGui/qpaintdevice.h \
+		/opt/qt5.7.0_arm/include/QtCore/qrect.h \
+		/opt/qt5.7.0_arm/include/QtCore/qsize.h \
+		/opt/qt5.7.0_arm/include/QtCore/qpoint.h \
+		/opt/qt5.7.0_arm/include/QtGui/qpalette.h \
+		/opt/qt5.7.0_arm/include/QtGui/qcolor.h \
+		/opt/qt5.7.0_arm/include/QtGui/qrgb.h \
+		/opt/qt5.7.0_arm/include/QtGui/qrgba64.h \
+		/opt/qt5.7.0_arm/include/QtGui/qbrush.h \
+		/opt/qt5.7.0_arm/include/QtCore/qvector.h \
+		/opt/qt5.7.0_arm/include/QtGui/qmatrix.h \
+		/opt/qt5.7.0_arm/include/QtGui/qpolygon.h \
+		/opt/qt5.7.0_arm/include/QtGui/qregion.h \
+		/opt/qt5.7.0_arm/include/QtCore/qdatastream.h \
+		/opt/qt5.7.0_arm/include/QtCore/qiodevice.h \
+		/opt/qt5.7.0_arm/include/QtCore/qline.h \
+		/opt/qt5.7.0_arm/include/QtGui/qtransform.h \
+		/opt/qt5.7.0_arm/include/QtGui/qpainterpath.h \
+		/opt/qt5.7.0_arm/include/QtGui/qimage.h \
+		/opt/qt5.7.0_arm/include/QtGui/qpixelformat.h \
+		/opt/qt5.7.0_arm/include/QtGui/qpixmap.h \
+		/opt/qt5.7.0_arm/include/QtCore/qsharedpointer.h \
+		/opt/qt5.7.0_arm/include/QtCore/qshareddata.h \
+		/opt/qt5.7.0_arm/include/QtCore/qhash.h \
+		/opt/qt5.7.0_arm/include/QtCore/qsharedpointer_impl.h \
+		/opt/qt5.7.0_arm/include/QtGui/qfont.h \
+		/opt/qt5.7.0_arm/include/QtGui/qfontmetrics.h \
+		/opt/qt5.7.0_arm/include/QtGui/qfontinfo.h \
+		/opt/qt5.7.0_arm/include/QtWidgets/qsizepolicy.h \
+		/opt/qt5.7.0_arm/include/QtGui/qcursor.h \
+		/opt/qt5.7.0_arm/include/QtGui/qkeysequence.h \
+		/opt/qt5.7.0_arm/include/QtGui/qevent.h \
+		/opt/qt5.7.0_arm/include/QtCore/qvariant.h \
+		/opt/qt5.7.0_arm/include/QtCore/qmap.h \
+		/opt/qt5.7.0_arm/include/QtCore/qdebug.h \
+		/opt/qt5.7.0_arm/include/QtCore/qtextstream.h \
+		/opt/qt5.7.0_arm/include/QtCore/qlocale.h \
+		/opt/qt5.7.0_arm/include/QtCore/qset.h \
+		/opt/qt5.7.0_arm/include/QtCore/qcontiguouscache.h \
+		/opt/qt5.7.0_arm/include/QtCore/qurl.h \
+		/opt/qt5.7.0_arm/include/QtCore/qurlquery.h \
+		/opt/qt5.7.0_arm/include/QtCore/qfile.h \
+		/opt/qt5.7.0_arm/include/QtCore/qfiledevice.h \
+		/opt/qt5.7.0_arm/include/QtGui/qvector2d.h \
+		/opt/qt5.7.0_arm/include/QtGui/qtouchdevice.h \
+		/opt/qt5.7.0_arm/include/QtWidgets/qtabwidget.h \
+		/opt/qt5.7.0_arm/include/QtGui/qicon.h \
+		/opt/qt5.7.0_arm/include/QtGui/QPaintEvent \
+		/opt/qt5.7.0_arm/include/QtCore/QTimer \
+		/opt/qt5.7.0_arm/include/QtCore/qtimer.h \
+		/opt/qt5.7.0_arm/include/QtCore/qbasictimer.h \
+		/opt/qt5.7.0_arm/include/QtGui/QPainter \
+		/opt/qt5.7.0_arm/include/QtGui/qpainter.h \
+		/opt/qt5.7.0_arm/include/QtGui/qtextoption.h \
+		/opt/qt5.7.0_arm/include/QtGui/qpen.h \
+		/opt/qt5.7.0_arm/include/QtGui/QPixmap \
+		/opt/qt5.7.0_arm/include/QtWidgets/QLabel \
+		/opt/qt5.7.0_arm/include/QtWidgets/qlabel.h \
+		/opt/qt5.7.0_arm/include/QtWidgets/qframe.h \
+		/opt/qt5.7.0_arm/include/QtGui/QImage \
+		/opt/qt5.7.0_arm/include/QtCore/QDebug \
+		include/ui_mainwindow.h \
+		/opt/qt5.7.0_arm/include/QtCore/QVariant \
+		/opt/qt5.7.0_arm/include/QtWidgets/QAction \
+		/opt/qt5.7.0_arm/include/QtWidgets/qaction.h \
+		/opt/qt5.7.0_arm/include/QtWidgets/qactiongroup.h \
+		/opt/qt5.7.0_arm/include/QtWidgets/QApplication \
+		/opt/qt5.7.0_arm/include/QtWidgets/qapplication.h \
+		/opt/qt5.7.0_arm/include/QtCore/qcoreapplication.h \
+		/opt/qt5.7.0_arm/include/QtCore/qeventloop.h \
+		/opt/qt5.7.0_arm/include/QtWidgets/qdesktopwidget.h \
+		/opt/qt5.7.0_arm/include/QtGui/qguiapplication.h \
+		/opt/qt5.7.0_arm/include/QtGui/qinputmethod.h \
+		/opt/qt5.7.0_arm/include/QtWidgets/QButtonGroup \
+		/opt/qt5.7.0_arm/include/QtWidgets/qbuttongroup.h \
+		/opt/qt5.7.0_arm/include/QtWidgets/QHeaderView \
+		/opt/qt5.7.0_arm/include/QtWidgets/qheaderview.h \
+		/opt/qt5.7.0_arm/include/QtWidgets/qabstractitemview.h \
+		/opt/qt5.7.0_arm/include/QtWidgets/qabstractscrollarea.h \
+		/opt/qt5.7.0_arm/include/QtCore/qabstractitemmodel.h \
+		/opt/qt5.7.0_arm/include/QtCore/qitemselectionmodel.h \
+		/opt/qt5.7.0_arm/include/QtWidgets/qabstractitemdelegate.h \
+		/opt/qt5.7.0_arm/include/QtWidgets/qstyleoption.h \
+		/opt/qt5.7.0_arm/include/QtWidgets/qabstractspinbox.h \
+		/opt/qt5.7.0_arm/include/QtGui/qvalidator.h \
+		/opt/qt5.7.0_arm/include/QtCore/qregularexpression.h \
+		/opt/qt5.7.0_arm/include/QtWidgets/qslider.h \
+		/opt/qt5.7.0_arm/include/QtWidgets/qabstractslider.h \
+		/opt/qt5.7.0_arm/include/QtWidgets/qstyle.h \
+		/opt/qt5.7.0_arm/include/QtWidgets/qtabbar.h \
+		/opt/qt5.7.0_arm/include/QtWidgets/qrubberband.h \
+		/opt/qt5.7.0_arm/include/QtWidgets/QPushButton \
+		/opt/qt5.7.0_arm/include/QtWidgets/qpushbutton.h \
+		/opt/qt5.7.0_arm/include/QtWidgets/qabstractbutton.h \
+		/opt/qt5.7.0_arm/include/QtWidgets/QWidget \
+		include/video.h \
+		/usr/local/jpeglib/include/jpeglib.h \
+		/usr/local/jpeglib/include/jconfig.h \
+		/usr/local/jpeglib/include/jmorecfg.h \
+		/usr/local/jpeglib/include/jerror.h \
+		/usr/local/opencv-arm/include/opencv2/highgui.hpp \
+		/usr/local/opencv-arm/include/opencv2/core.hpp \
+		/usr/local/opencv-arm/include/opencv2/core/cvdef.h \
+		/usr/local/opencv-arm/include/opencv2/core/hal/interface.h \
+		/usr/local/opencv-arm/include/opencv2/core/version.hpp \
+		/usr/local/opencv-arm/include/opencv2/core/base.hpp \
+		/usr/local/opencv-arm/include/opencv2/opencv_modules.hpp \
+		/usr/local/opencv-arm/include/opencv2/core/cvstd.hpp \
+		/usr/local/opencv-arm/include/opencv2/core/ptr.inl.hpp \
+		/usr/local/opencv-arm/include/opencv2/core/neon_utils.hpp \
+		/usr/local/opencv-arm/include/opencv2/core/traits.hpp \
+		/usr/local/opencv-arm/include/opencv2/core/matx.hpp \
+		/usr/local/opencv-arm/include/opencv2/core/saturate.hpp \
+		/usr/local/opencv-arm/include/opencv2/core/fast_math.hpp \
+		/usr/local/opencv-arm/include/opencv2/core/types.hpp \
+		/usr/local/opencv-arm/include/opencv2/core/mat.hpp \
+		/usr/local/opencv-arm/include/opencv2/core/bufferpool.hpp \
+		/usr/local/opencv-arm/include/opencv2/core/mat.inl.hpp \
+		/usr/local/opencv-arm/include/opencv2/core/persistence.hpp \
+		/usr/local/opencv-arm/include/opencv2/core/operations.hpp \
+		/usr/local/opencv-arm/include/opencv2/core/cvstd.inl.hpp \
+		/usr/local/opencv-arm/include/opencv2/core/utility.hpp \
+		/usr/local/opencv-arm/include/opencv2/core/core_c.h \
+		/usr/local/opencv-arm/include/opencv2/core/types_c.h \
+		/usr/local/opencv-arm/include/opencv2/core/optim.hpp \
+		/usr/local/opencv-arm/include/opencv2/core/ovx.hpp \
+		/usr/local/opencv-arm/include/opencv2/imgcodecs.hpp \
+		/usr/local/opencv-arm/include/opencv2/videoio.hpp \
+		/usr/local/opencv-arm/include/opencv2/highgui/highgui_c.h \
+		/usr/local/opencv-arm/include/opencv2/imgproc/imgproc_c.h \
+		/usr/local/opencv-arm/include/opencv2/imgproc/types_c.h \
+		/usr/local/opencv-arm/include/opencv2/imgcodecs/imgcodecs_c.h \
+		/usr/local/opencv-arm/include/opencv2/videoio/videoio_c.h \
+		/usr/local/opencv-arm/include/opencv2/core/core.hpp \
+		/usr/local/opencv-arm/include/opencv2/highgui/highgui.hpp \
+		/usr/local/opencv-arm/include/opencv2/imgproc/imgproc.hpp \
+		/usr/local/opencv-arm/include/opencv2/imgproc.hpp \
+		include/pic_thread.h \
+		/opt/qt5.7.0_arm/include/QtCore/QThread \
+		/opt/qt5.7.0_arm/include/QtCore/qthread.h \
+		include/net.h \
+		include/blob.h \
+		include/platform.h \
+		include/layer.h \
+		include/mat.h \
+		include/paramdict.h \
+		include/mat_to_jpeg.h \
+		include/queue.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o mainwindow.o src/mainwindow.cpp
 
-video.o: src/video.cpp 
+video.o: src/video.cpp include/video.h \
+		/usr/local/jpeglib/include/jpeglib.h \
+		/usr/local/jpeglib/include/jconfig.h \
+		/usr/local/jpeglib/include/jmorecfg.h \
+		/usr/local/jpeglib/include/jerror.h \
+		/usr/local/opencv-arm/include/opencv2/highgui.hpp \
+		/usr/local/opencv-arm/include/opencv2/core.hpp \
+		/usr/local/opencv-arm/include/opencv2/core/cvdef.h \
+		/usr/local/opencv-arm/include/opencv2/core/hal/interface.h \
+		/usr/local/opencv-arm/include/opencv2/core/version.hpp \
+		/usr/local/opencv-arm/include/opencv2/core/base.hpp \
+		/usr/local/opencv-arm/include/opencv2/opencv_modules.hpp \
+		/usr/local/opencv-arm/include/opencv2/core/cvstd.hpp \
+		/usr/local/opencv-arm/include/opencv2/core/ptr.inl.hpp \
+		/usr/local/opencv-arm/include/opencv2/core/neon_utils.hpp \
+		/usr/local/opencv-arm/include/opencv2/core/traits.hpp \
+		/usr/local/opencv-arm/include/opencv2/core/matx.hpp \
+		/usr/local/opencv-arm/include/opencv2/core/saturate.hpp \
+		/usr/local/opencv-arm/include/opencv2/core/fast_math.hpp \
+		/usr/local/opencv-arm/include/opencv2/core/types.hpp \
+		/usr/local/opencv-arm/include/opencv2/core/mat.hpp \
+		/usr/local/opencv-arm/include/opencv2/core/bufferpool.hpp \
+		/usr/local/opencv-arm/include/opencv2/core/mat.inl.hpp \
+		/usr/local/opencv-arm/include/opencv2/core/persistence.hpp \
+		/usr/local/opencv-arm/include/opencv2/core/operations.hpp \
+		/usr/local/opencv-arm/include/opencv2/core/cvstd.inl.hpp \
+		/usr/local/opencv-arm/include/opencv2/core/utility.hpp \
+		/usr/local/opencv-arm/include/opencv2/core/core_c.h \
+		/usr/local/opencv-arm/include/opencv2/core/types_c.h \
+		/usr/local/opencv-arm/include/opencv2/core/optim.hpp \
+		/usr/local/opencv-arm/include/opencv2/core/ovx.hpp \
+		/usr/local/opencv-arm/include/opencv2/imgcodecs.hpp \
+		/usr/local/opencv-arm/include/opencv2/videoio.hpp \
+		/usr/local/opencv-arm/include/opencv2/highgui/highgui_c.h \
+		/usr/local/opencv-arm/include/opencv2/imgproc/imgproc_c.h \
+		/usr/local/opencv-arm/include/opencv2/imgproc/types_c.h \
+		/usr/local/opencv-arm/include/opencv2/imgcodecs/imgcodecs_c.h \
+		/usr/local/opencv-arm/include/opencv2/videoio/videoio_c.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o video.o src/video.cpp
+
+HAL_TCP_linux.o: src/HAL_TCP_linux.c include/HAL_TCP_linux.h
+	$(CC) -c $(CFLAGS) $(INCPATH) -o HAL_TCP_linux.o src/HAL_TCP_linux.c
+
+queue.o: src/queue.cpp include/queue.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o queue.o src/queue.cpp
+
+pic_thread.o: src/pic_thread.cpp include/pic_thread.h \
+		/opt/qt5.7.0_arm/include/QtCore/QThread \
+		/opt/qt5.7.0_arm/include/QtCore/qthread.h \
+		/opt/qt5.7.0_arm/include/QtCore/qobject.h \
+		/opt/qt5.7.0_arm/include/QtCore/qobjectdefs.h \
+		/opt/qt5.7.0_arm/include/QtCore/qnamespace.h \
+		/opt/qt5.7.0_arm/include/QtCore/qglobal.h \
+		/opt/qt5.7.0_arm/include/QtCore/qconfig.h \
+		/opt/qt5.7.0_arm/include/QtCore/qfeatures.h \
+		/opt/qt5.7.0_arm/include/QtCore/qsystemdetection.h \
+		/opt/qt5.7.0_arm/include/QtCore/qprocessordetection.h \
+		/opt/qt5.7.0_arm/include/QtCore/qcompilerdetection.h \
+		/opt/qt5.7.0_arm/include/QtCore/qtypeinfo.h \
+		/opt/qt5.7.0_arm/include/QtCore/qtypetraits.h \
+		/opt/qt5.7.0_arm/include/QtCore/qisenum.h \
+		/opt/qt5.7.0_arm/include/QtCore/qsysinfo.h \
+		/opt/qt5.7.0_arm/include/QtCore/qlogging.h \
+		/opt/qt5.7.0_arm/include/QtCore/qflags.h \
+		/opt/qt5.7.0_arm/include/QtCore/qatomic.h \
+		/opt/qt5.7.0_arm/include/QtCore/qbasicatomic.h \
+		/opt/qt5.7.0_arm/include/QtCore/qatomic_bootstrap.h \
+		/opt/qt5.7.0_arm/include/QtCore/qgenericatomic.h \
+		/opt/qt5.7.0_arm/include/QtCore/qatomic_cxx11.h \
+		/opt/qt5.7.0_arm/include/QtCore/qatomic_msvc.h \
+		/opt/qt5.7.0_arm/include/QtCore/qglobalstatic.h \
+		/opt/qt5.7.0_arm/include/QtCore/qmutex.h \
+		/opt/qt5.7.0_arm/include/QtCore/qnumeric.h \
+		/opt/qt5.7.0_arm/include/QtCore/qversiontagging.h \
+		/opt/qt5.7.0_arm/include/QtCore/qobjectdefs_impl.h \
+		/opt/qt5.7.0_arm/include/QtCore/qstring.h \
+		/opt/qt5.7.0_arm/include/QtCore/qchar.h \
+		/opt/qt5.7.0_arm/include/QtCore/qbytearray.h \
+		/opt/qt5.7.0_arm/include/QtCore/qrefcount.h \
+		/opt/qt5.7.0_arm/include/QtCore/qarraydata.h \
+		/opt/qt5.7.0_arm/include/QtCore/qstringbuilder.h \
+		/opt/qt5.7.0_arm/include/QtCore/qlist.h \
+		/opt/qt5.7.0_arm/include/QtCore/qalgorithms.h \
+		/opt/qt5.7.0_arm/include/QtCore/qiterator.h \
+		/opt/qt5.7.0_arm/include/QtCore/qhashfunctions.h \
+		/opt/qt5.7.0_arm/include/QtCore/qpair.h \
+		/opt/qt5.7.0_arm/include/QtCore/qbytearraylist.h \
+		/opt/qt5.7.0_arm/include/QtCore/qstringlist.h \
+		/opt/qt5.7.0_arm/include/QtCore/qregexp.h \
+		/opt/qt5.7.0_arm/include/QtCore/qstringmatcher.h \
+		/opt/qt5.7.0_arm/include/QtCore/qcoreevent.h \
+		/opt/qt5.7.0_arm/include/QtCore/qscopedpointer.h \
+		/opt/qt5.7.0_arm/include/QtCore/qmetatype.h \
+		/opt/qt5.7.0_arm/include/QtCore/qvarlengtharray.h \
+		/opt/qt5.7.0_arm/include/QtCore/qcontainerfwd.h \
+		/opt/qt5.7.0_arm/include/QtCore/qobject_impl.h \
+		include/queue.h \
+		/usr/local/opencv-arm/include/opencv2/highgui/highgui.hpp \
+		/usr/local/opencv-arm/include/opencv2/highgui.hpp \
+		/usr/local/opencv-arm/include/opencv2/core.hpp \
+		/usr/local/opencv-arm/include/opencv2/core/cvdef.h \
+		/usr/local/opencv-arm/include/opencv2/core/hal/interface.h \
+		/usr/local/opencv-arm/include/opencv2/core/version.hpp \
+		/usr/local/opencv-arm/include/opencv2/core/base.hpp \
+		/usr/local/opencv-arm/include/opencv2/opencv_modules.hpp \
+		/usr/local/opencv-arm/include/opencv2/core/cvstd.hpp \
+		/usr/local/opencv-arm/include/opencv2/core/ptr.inl.hpp \
+		/usr/local/opencv-arm/include/opencv2/core/neon_utils.hpp \
+		/usr/local/opencv-arm/include/opencv2/core/traits.hpp \
+		/usr/local/opencv-arm/include/opencv2/core/matx.hpp \
+		/usr/local/opencv-arm/include/opencv2/core/saturate.hpp \
+		/usr/local/opencv-arm/include/opencv2/core/fast_math.hpp \
+		/usr/local/opencv-arm/include/opencv2/core/types.hpp \
+		/usr/local/opencv-arm/include/opencv2/core/mat.hpp \
+		/usr/local/opencv-arm/include/opencv2/core/bufferpool.hpp \
+		/usr/local/opencv-arm/include/opencv2/core/mat.inl.hpp \
+		/usr/local/opencv-arm/include/opencv2/core/persistence.hpp \
+		/usr/local/opencv-arm/include/opencv2/core/operations.hpp \
+		/usr/local/opencv-arm/include/opencv2/core/cvstd.inl.hpp \
+		/usr/local/opencv-arm/include/opencv2/core/utility.hpp \
+		/usr/local/opencv-arm/include/opencv2/core/core_c.h \
+		/usr/local/opencv-arm/include/opencv2/core/types_c.h \
+		/usr/local/opencv-arm/include/opencv2/core/optim.hpp \
+		/usr/local/opencv-arm/include/opencv2/core/ovx.hpp \
+		/usr/local/opencv-arm/include/opencv2/imgcodecs.hpp \
+		/usr/local/opencv-arm/include/opencv2/videoio.hpp \
+		/usr/local/opencv-arm/include/opencv2/highgui/highgui_c.h \
+		/usr/local/opencv-arm/include/opencv2/imgproc/imgproc_c.h \
+		/usr/local/opencv-arm/include/opencv2/imgproc/types_c.h \
+		/usr/local/opencv-arm/include/opencv2/imgcodecs/imgcodecs_c.h \
+		/usr/local/opencv-arm/include/opencv2/videoio/videoio_c.h \
+		/opt/qt5.7.0_arm/include/QtCore/QDebug \
+		/opt/qt5.7.0_arm/include/QtCore/qdebug.h \
+		/opt/qt5.7.0_arm/include/QtCore/qhash.h \
+		/opt/qt5.7.0_arm/include/QtCore/qmap.h \
+		/opt/qt5.7.0_arm/include/QtCore/qtextstream.h \
+		/opt/qt5.7.0_arm/include/QtCore/qiodevice.h \
+		/opt/qt5.7.0_arm/include/QtCore/qlocale.h \
+		/opt/qt5.7.0_arm/include/QtCore/qvariant.h \
+		/opt/qt5.7.0_arm/include/QtCore/qshareddata.h \
+		/opt/qt5.7.0_arm/include/QtCore/qvector.h \
+		/opt/qt5.7.0_arm/include/QtCore/qpoint.h \
+		/opt/qt5.7.0_arm/include/QtCore/qset.h \
+		/opt/qt5.7.0_arm/include/QtCore/qcontiguouscache.h \
+		/opt/qt5.7.0_arm/include/QtCore/qsharedpointer.h \
+		/opt/qt5.7.0_arm/include/QtCore/qsharedpointer_impl.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o pic_thread.o src/pic_thread.cpp
+
+rtp_client.o: src/rtp_client.cpp include/rtp_client.h \
+		../jrtplib-3.11.1/src/rtpsession.h \
+		../jrtplib-3.11.1/src/rtpconfig.h \
+		../jrtplib-3.11.1/src/rtplibraryversion.h \
+		../jrtplib-3.11.1/src/rtppacketbuilder.h \
+		../jrtplib-3.11.1/src/rtperrors.h \
+		../jrtplib-3.11.1/src/rtpdefines.h \
+		../jrtplib-3.11.1/src/rtprandom.h \
+		../jrtplib-3.11.1/src/rtptypes.h \
+		../jrtplib-3.11.1/src/rtptimeutilities.h \
+		../jrtplib-3.11.1/src/rtpmemoryobject.h \
+		../jrtplib-3.11.1/src/rtpmemorymanager.h \
+		../jrtplib-3.11.1/src/rtpsessionsources.h \
+		../jrtplib-3.11.1/src/rtpsources.h \
+		../jrtplib-3.11.1/src/rtpkeyhashtable.h \
+		../jrtplib-3.11.1/src/rtcpsdespacket.h \
+		../jrtplib-3.11.1/src/rtcppacket.h \
+		../jrtplib-3.11.1/src/rtpstructs.h \
+		../jrtplib-3.11.1/src/rtptransmitter.h \
+		../jrtplib-3.11.1/src/rtpcollisionlist.h \
+		../jrtplib-3.11.1/src/rtpaddress.h \
+		../jrtplib-3.11.1/src/rtcpscheduler.h \
+		../jrtplib-3.11.1/src/rtcppacketbuilder.h \
+		../jrtplib-3.11.1/src/rtcpsdesinfo.h \
+		../jrtplib-3.11.1/src/rtcpcompoundpacketbuilder.h \
+		../jrtplib-3.11.1/src/rtcpcompoundpacket.h \
+		../jrtplib-3.11.1/src/rtpsessionparams.h \
+		../jrtplib-3.11.1/src/rtpudpv4transmitter.h \
+		../jrtplib-3.11.1/src/rtpipv4destination.h \
+		../jrtplib-3.11.1/src/rtpipv4address.h \
+		../jrtplib-3.11.1/src/rtphashtable.h \
+		../jrtplib-3.11.1/src/rtpsocketutil.h \
+		../jrtplib-3.11.1/src/rtpabortdescriptors.h \
+		../jrtplib-3.11.1/src/rtppacket.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o rtp_client.o src/rtp_client.cpp
+
+mat_to_jpeg.o: src/mat_to_jpeg.cpp /usr/local/opencv-arm/include/opencv2/highgui/highgui.hpp \
+		/usr/local/opencv-arm/include/opencv2/highgui.hpp \
+		/usr/local/opencv-arm/include/opencv2/core.hpp \
+		/usr/local/opencv-arm/include/opencv2/core/cvdef.h \
+		/usr/local/opencv-arm/include/opencv2/core/hal/interface.h \
+		/usr/local/opencv-arm/include/opencv2/core/version.hpp \
+		/usr/local/opencv-arm/include/opencv2/core/base.hpp \
+		/usr/local/opencv-arm/include/opencv2/opencv_modules.hpp \
+		/usr/local/opencv-arm/include/opencv2/core/cvstd.hpp \
+		/usr/local/opencv-arm/include/opencv2/core/ptr.inl.hpp \
+		/usr/local/opencv-arm/include/opencv2/core/neon_utils.hpp \
+		/usr/local/opencv-arm/include/opencv2/core/traits.hpp \
+		/usr/local/opencv-arm/include/opencv2/core/matx.hpp \
+		/usr/local/opencv-arm/include/opencv2/core/saturate.hpp \
+		/usr/local/opencv-arm/include/opencv2/core/fast_math.hpp \
+		/usr/local/opencv-arm/include/opencv2/core/types.hpp \
+		/usr/local/opencv-arm/include/opencv2/core/mat.hpp \
+		/usr/local/opencv-arm/include/opencv2/core/bufferpool.hpp \
+		/usr/local/opencv-arm/include/opencv2/core/mat.inl.hpp \
+		/usr/local/opencv-arm/include/opencv2/core/persistence.hpp \
+		/usr/local/opencv-arm/include/opencv2/core/operations.hpp \
+		/usr/local/opencv-arm/include/opencv2/core/cvstd.inl.hpp \
+		/usr/local/opencv-arm/include/opencv2/core/utility.hpp \
+		/usr/local/opencv-arm/include/opencv2/core/core_c.h \
+		/usr/local/opencv-arm/include/opencv2/core/types_c.h \
+		/usr/local/opencv-arm/include/opencv2/core/optim.hpp \
+		/usr/local/opencv-arm/include/opencv2/core/ovx.hpp \
+		/usr/local/opencv-arm/include/opencv2/imgcodecs.hpp \
+		/usr/local/opencv-arm/include/opencv2/videoio.hpp \
+		/usr/local/opencv-arm/include/opencv2/highgui/highgui_c.h \
+		/usr/local/opencv-arm/include/opencv2/imgproc/imgproc_c.h \
+		/usr/local/opencv-arm/include/opencv2/imgproc/types_c.h \
+		/usr/local/opencv-arm/include/opencv2/imgcodecs/imgcodecs_c.h \
+		/usr/local/opencv-arm/include/opencv2/videoio/videoio_c.h \
+		include/mat_to_jpeg.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o mat_to_jpeg.o src/mat_to_jpeg.cpp
 
 moc_mainwindow.o: moc_mainwindow.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_mainwindow.o moc_mainwindow.cpp

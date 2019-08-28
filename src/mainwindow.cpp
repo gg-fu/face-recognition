@@ -1,23 +1,29 @@
 #include "include/mainwindow.h"
 #include "include/ui_mainwindow.h"
+#include "include/mat_to_jpeg.h"
+#include "include/queue.h"
+#include <string.h>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    Pnet.load_param("det1.param");
-    Pnet.load_model("det1.bin");
-    Rnet.load_param("det2.param");
-    Rnet.load_model("det2.bin");
-    Onet.load_param("det3.param");
-    Onet.load_model("det3.bin");
+    Pnet.load_param("./files/det1.param");
+    Pnet.load_model("./files/det1.bin");
+    Rnet.load_param("./files/det2.param");
+    Rnet.load_model("./files/det2.bin");
+    Onet.load_param("./files/det3.param");
+    Onet.load_model("./files/det3.bin");
     timer = new QTimer(this);
-    width = 320;
+    width = 432;
     height = 240;
+    timer_count = 0;
     rgb24Size = width * height * 3;
     rgb24Pitch = width * 3;
     rgb24 = new unsigned char[rgb24Size]();
+
+    pic_thread = new PicThread;
     /*信号和槽*/
     connect(ui->pushButton_2,SIGNAL(clicked(bool)),this,SLOT(pushButton_2_clicked()),Qt::UniqueConnection);//打开摄像头按
     connect(timer, SIGNAL(timeout()), this, SLOT(getFrame()));//超时就读取当前摄像头信息
@@ -28,7 +34,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
 MainWindow::~MainWindow()
 {
-	    delete ui;
+	delete ui;
 }
 
 bool cmpScore(orderScore lsh, orderScore rsh){
@@ -53,35 +59,66 @@ void MainWindow::pushButton_2_clicked()
 	printf("width:%d,height:%d\n",camera->width,camera->height);
 	C_camera->CCamera_init(camera);
 	C_camera->CCamera_start(camera);
-	timer->start(30);
-
+	timer->start(20);
+	pic_thread->start();
 }
-
 void MainWindow::getFrame()
 {
 	Mat dst;
+	JPEG jpeg;
+	PIC_QUE Q;
+	vector<unsigned char>buff;
 	C_camera->CCamera_capture(camera);
 	C_camera->convert_yuv_to_rgb_buffer((unsigned char*)camera->head.start,(unsigned char*)rgb24, width, height);
 	C_camera->CRgb2Mat(rgb24,dst,width,height,3);
 	std::vector<Bbox> finalBbox;
 	ncnn::Mat ncnn_img = ncnn::Mat::from_pixels(dst.data, ncnn::Mat::PIXEL_BGR2RGB, dst.cols, dst.rows);
-	struct timeval  tv1,tv2;
+	/*struct timeval  tv1,tv2;
 	struct timezone tz1,tz2;
-	gettimeofday(&tv1,&tz1);
+	gettimeofday(&tv1,&tz1);*/
 	detect(ncnn_img, finalBbox);
-	gettimeofday(&tv2,&tz2);
+	//gettimeofday(&tv2,&tz2);
 	/*printf( "%s = %g ms \n ", "Detection All time", getElapse(&tv1, &tv2) );*/
 	for(vector<Bbox>::iterator it=finalBbox.begin(); it!=finalBbox.end();it++){
 		if((*it).exist){
-			cv::rectangle(dst, Point((*it).x1, (*it).y1), Point((*it).x2, (*it).y2), Scalar(0,0,255), 1,8,0);
+			int x1 = (*it).x1;
+			int x2 = (*it).x2;
+			int y1 = (*it).y1;
+			int y2 = (*it).y2;
+			string recv_data;
+			int ret = Q.dequeue(recv_data);
+			if(recv_data != "failed" && ret == 0){
+				timer_flag = true;
+				queue_data = recv_data;
+			}	
+			else{
+				cv::Rect m_select;
+				m_select = Rect(x1,y1,x2-x1,y2-y1);
+				Mat img = dst(m_select);
+				jpeg.JPEG_enCode(img,buff);
+				Q.EN_Queue(buff);
+			}
+			cv::rectangle(dst, Point(x1, y1), Point(x2, y2), Scalar(0,0,255), 1,8,0);
 			/*for(int num=0;num<5;num++)circle(dst,Point((int)*(it->ppoint+num), (int)*(it->ppoint+num+5)),3,Scalar(0,255,255), -1);*/
 		}
 	}
-
+	if (timer_flag)
+	{
+		timer_count++;
+		if(timer_count >= 30){
+			timer_count = 0;
+			timer_flag = false;
+			queue_data = "";
+		}	
+		else{
+			cv::putText(dst, queue_data, Point(100,125), cv::FONT_HERSHEY_COMPLEX, 2.0, cv::Scalar(0, 255, 255), 2, 8, 0);	
+		}
+	}
 	const unsigned char *IMG = (const unsigned char *)dst.data;
 	QImage *mImage = new QImage(IMG, width, height, rgb24Pitch, QImage::Format_RGB888);
 	*mImage = mImage->scaled(ui->label->size(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
 	ui->label->setPixmap(QPixmap::fromImage(*mImage));
+	delete mImage;
 }
 
 void MainWindow::pushButton_3_clicked()
@@ -92,6 +129,7 @@ void MainWindow::pushButton_3_clicked()
 	C_camera->CRgb2Mat(rgb24,dst,width,height,3);
 	//detect_face(dst);
 	const unsigned char *IMG = (const unsigned char *)dst.data;
+	printf("img:%s\n",IMG);
 	QImage *image = new QImage(IMG, width, height, rgb24Pitch, QImage::Format_RGB888);
 	image->save("/usr/local/result.jpg");
 	*image = image->scaled(ui->label_2->size(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
@@ -100,12 +138,16 @@ void MainWindow::pushButton_3_clicked()
 
 void MainWindow::pushButton_clicked()
 {
-	timer->stop();
-	C_camera->CCamera_close(camera);
 	delete timer;
 	delete[] rgb24;
+	delete pic_thread;
+	
+	/*关闭多线程*/
+	pic_thread->closeThread();
+	pic_thread->wait();
+	C_camera->CCamera_close(camera);
 	this->close();
-
+	//qApp->exit(0);
 }
 
 void MainWindow::on_pushButton_4_clicked()

@@ -17,6 +17,7 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
+#include "include/pic_thread.h"
 #include "net.h"
 #include <algorithm>
 #include <vector>
@@ -68,18 +69,21 @@ private slots:
     void pushButton_3_clicked();
     void pushButton_clicked();
     void on_pushButton_4_clicked();
-
 private:
     Ui::MainWindow *ui;
     VideoCapture capture;
     QTimer *timer;
-    camera_t* camera;
+    PicThread *pic_thread;
+    camera_t* camera = NULL;
     uint32_t width;
     uint32_t height;
-    CCamera *C_camera;
+    CCamera *C_camera = NULL;
     int rgb24Size;
     int rgb24Pitch;
     unsigned char *rgb24;
+    int timer_count;
+    string queue_data;
+    bool timer_flag = false;
     bool flag=true;
     /*CascadeClassifier face_cascade;
     String face_cascade_name = "./haarcascade_frontalface_alt_tree.xml";*/

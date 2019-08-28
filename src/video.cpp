@@ -125,9 +125,12 @@ void CCamera::CCamera_finish(camera_t* camera)
 
 void CCamera::CCamera_close(camera_t* camera)
 {
+    if(camera == NULL) 
+	    return;
     CCamera_stop(camera);
     CCamera_finish(camera);
-    if (close(camera->fd) == -1) quit("close");
+    if (close(camera->fd) == -1) 
+	    printf("close camera\n");//quit("close");
     free(camera);
 }
 
